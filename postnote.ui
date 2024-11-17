@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PostNoteClass</class>
+ <widget class="QMainWindow" name="PostNoteClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>224</width>
+    <height>138</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PostNote</string>
+  </property>
+  <widget class="QWidget" name="centralWidget"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>224</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionNew_Note">
+   <property name="text">
+    <string>New Note</string>
+   </property>
+  </action>
+  <action name="actionSave_All_Notes">
+   <property name="text">
+    <string>Save All Notes</string>
+   </property>
+  </action>
+  <action name="actionHide_All_Notes">
+   <property name="text">
+    <string>Hide All Notes</string>
+   </property>
+  </action>
+  <action name="actionShow_All_Notes">
+   <property name="text">
+    <string>Show All Notes</string>
+   </property>
+  </action>
+  <action name="actionShow_Note">
+   <property name="text">
+    <string>Show Note</string>
+   </property>
+  </action>
+  <action name="actionExport_Notes">
+   <property name="text">
+    <string>Export Notes</string>
+   </property>
+  </action>
+  <action name="actionEdit_Topics">
+   <property name="text">
+    <string>Edit Topics...</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences...</string>
+   </property>
+   <property name="toolTip">
+    <string>PostNote Preferences</string>
+   </property>
+  </action>
+  <action name="actionAbout_PostNote">
+   <property name="text">
+    <string>About PostNote...</string>
+   </property>
+  </action>
+  <action name="actionExit_PostNote">
+   <property name="text">
+    <string>Exit PostNote</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="text">
+    <string>About Qt...</string>
+   </property>
+  </action>
+  <action name="actionSmall">
+   <property name="text">
+    <string>Small</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a small note</string>
+   </property>
+  </action>
+  <action name="actionMedium">
+   <property name="text">
+    <string>Medium</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a medium note</string>
+   </property>
+  </action>
+  <action name="actionLarge">
+   <property name="text">
+    <string>Large</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a large note</string>
+   </property>
+  </action>
+  <action name="actionExtra_Large">
+   <property name="text">
+    <string>Extra Large</string>
+   </property>
+   <property name="toolTip">
+    <string>Create an extra large note</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="postnote.qrc"/>
+ </resources>
+ <connections/>
+</ui>
