@@ -5,6 +5,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from util import getScriptPath
 from postnote import PostNoteWindow
+from database import Database
 
 kLogFile = 'PyPostNote.log'
 kMaxLogileSize = 1024 * 1024
@@ -26,14 +27,17 @@ def main():
 
   logging.info("PyPostNote startig up...")
 
+  database = Database()
   window = PostNoteWindow()
-  window.initialize()
+  # TODO: Pass note manager and topic manager into here also
+  window.initialize(database)
 
-  # TODO: Eventually, don't want  to show the window
+  # Don't want  to show the window
   # window.hide()
-  window.show()
 
   returnValue = app.exec()
+
+  database.closeDatabase()
   shutdownApp()
 
   sys.exit(returnValue)

@@ -1,6 +1,12 @@
 from PySide6 import QtCore, QtWidgets, QtGui
+from database import Database
 from ui_postnote import Ui_PostNoteClass
 import logging
+
+from util import getDatabasePath
+
+kAppName = 'PyPostNote'
+kDatabaseName = 'Notes.db'
 
 class PostNoteWindow(QtWidgets.QMainWindow):
 
@@ -13,9 +19,25 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.setIcon()
     self.createNoteMenu()
 
-  def initialize(self):
-    logging.info('PostNoteWindow.initialize called.')
+  # TODO: Pass the note manager and topic manager here also
+  def initialize(self, db: Database):
     # TODO: See stuff from C++ version
+    self.db = db
+    databasePath = getDatabasePath(kAppName, kDatabaseName)
+    if self.db.openDatabase(databasePath):
+      topics = self.db.getTopics()
+
+      # Create topics
+      for topicData in topics:
+        # TODO: Create the topic (use the topic manager to do this)
+        pass
+
+      notes = self.db.getNotes()
+
+      # Create the note windows
+      for note in notes:
+        # TODO: Create the note window (use the note manager to do this)
+        pass
 
   def setIcon(self):
     systemTrayAvailable = QtWidgets.QSystemTrayIcon.isSystemTrayAvailable()
