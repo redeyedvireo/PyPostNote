@@ -1,5 +1,6 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from database import Database
+from note_manager import NoteManager
 from ui_postnote import Ui_PostNoteClass
 import logging
 
@@ -19,25 +20,34 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.setIcon()
     self.createNoteMenu()
 
-  # TODO: Pass the note manager and topic manager here also
-  def initialize(self, db: Database):
+  # TODO: Pass the topic manager here also
+  def initialize(self, db: Database, noteManager: NoteManager):
     # TODO: See stuff from C++ version
+    self.noteManager = noteManager
     self.db = db
+
     databasePath = getDatabasePath(kAppName, kDatabaseName)
     if self.db.openDatabase(databasePath):
-      topics = self.db.getTopics()
+      loadingTopicsSuccessful, topics = self.db.getTopics()
 
-      # Create topics
-      for topicData in topics:
-        # TODO: Create the topic (use the topic manager to do this)
-        pass
+      if loadingTopicsSuccessful:
+        # Create topics
+        for topicData in topics:
+          # TODO: Create the topic (use the topic manager to do this)
+          pass
+      else:
+        logging.error('Error loading topics')
+        # TODO: Pop up an error dialog
 
-      notes = self.db.getNotes()
+      loadingNotesSuccessful, notes = self.db.getNotes()
 
-      # Create the note windows
-      for note in notes:
-        # TODO: Create the note window (use the note manager to do this)
-        pass
+      if loadingNotesSuccessful:
+        # Create the note windows
+        for note in notes:
+          self.noteManager.createPopulatedNote(note)
+      else:
+        logging.error('Error loading notes')
+        # TODO: Pop up an error dialog
 
   def setIcon(self):
     systemTrayAvailable = QtWidgets.QSystemTrayIcon.isSystemTrayAvailable()
