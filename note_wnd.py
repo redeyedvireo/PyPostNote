@@ -1,4 +1,5 @@
 from PySide6 import QtCore, QtWidgets, QtGui
+from button_bar_widget import ButtonBarWidget
 from text_edit import TextEdit
 from ui_note_wnd import Ui_NoteWnd
 from note_data import NoteData, kInvalidNote, kInvalidTopic
@@ -108,5 +109,39 @@ class NoteWnd(QtWidgets.QWidget):
     self.setWindowFlag(QtCore.Qt.WindowType.WindowStaysOnTopHint, alwaysOnTop)
 
   def createButtonBarWidget(self):
-    # TODO: Implement
-    pass
+    self.buttonBarWidget = ButtonBarWidget(self.ui.textEdit.rect(), self)
+    self.topicMenu = QtWidgets.QMenu('Topic', self)
+    self.topicMenu.aboutToShow.connect(self.populateTopicMenu)
+    self.buttonBarWidget.setTopicMenu(self.topicMenu)
+
+    # TODO: Connect signals (see C++ version)
+
+  @QtCore.Slot()
+  def populateTopicMenu(self):
+    self.topicMenu.clear()
+
+    topicIdList = self.topicManager.getTopicIds()
+
+    for topicId in topicIdList:
+      topic = self.topicManager.getTopic(topicId)
+
+      if topic is not None:
+        newAction = self.topicMenu.addAction(topic.topicName)
+        newAction.setCheckable(True)
+
+        if self.topicId == topicId:
+          # Check the current topic
+          newAction.setChecked(True)
+
+        newAction.setData(topicId)
+        newAction.triggered.connect(self.onSetNewTopic)
+      else:
+        logging.error(f'[NoteWnd.populateTopicMenu] topic ID {topicId} not found in TopicManager')
+
+  def onSetNewTopic(self):
+    sender = self.sender()
+    if type(sender) is QtGui.QAction:
+      self.topicId = sender.data()
+      # TODO: Update the note in the database
+      # self.db.updateNote(self)
+      self.updateNote()

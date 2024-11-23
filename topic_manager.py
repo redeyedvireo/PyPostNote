@@ -9,6 +9,9 @@ class TopicManager:
   def getTopic(self, topicId: TOPIC_ID) -> Topic | None:
     return self.topicMap[topicId] if topicId in self.topicMap else None
   
+  def getTopicIds(self) -> list[TOPIC_ID]:
+    return self.topicMap.keys()
+
   def addTopic(self, topicData: TopicData):
     # First, check that the topicId is not already being used.
     if topicData.id in self.topicMap:
