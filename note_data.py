@@ -6,6 +6,7 @@ NOTE_ID = int
 TOPIC_ID = int
 
 kInvalidNote = -1
+kInvalidTopic = -1
 
 class NoteData:
   def __init__(self):

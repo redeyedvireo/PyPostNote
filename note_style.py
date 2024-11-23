@@ -1,4 +1,5 @@
 from enum import Enum
+from PySide6 import QtCore, QtWidgets, QtGui
 
 class ENoteBackground(Enum):
   eSolid = 0
@@ -11,4 +12,8 @@ class ENoteBackground(Enum):
 
 class NoteStyle:
   def __init__(self):
-    pass
+    # Some defaults
+    self.backgroundColor = QtGui.QColor("yellow")
+    self.textColor = QtGui.QColor("black")
+    self.backgroundType = ENoteBackground.eSolid
+    self.transparency = 100
