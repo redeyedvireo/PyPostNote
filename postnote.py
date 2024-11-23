@@ -1,6 +1,7 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from database import Database
 from note_manager import NoteManager
+from topic_manager import TopicManager
 from ui_postnote import Ui_PostNoteClass
 import logging
 
@@ -11,20 +12,21 @@ kDatabaseName = 'Notes.db'
 
 class PostNoteWindow(QtWidgets.QMainWindow):
 
-  def __init__(self):
+  def __init__(self, db: Database, noteManager: NoteManager, topicManager: TopicManager):
     super(PostNoteWindow, self).__init__()
 
     self.ui = Ui_PostNoteClass()
     self.ui.setupUi(self)
 
+    self.noteManager = noteManager
+    self.topicManager = topicManager
+    self.db = db
+
     self.setIcon()
     self.createNoteMenu()
 
-  # TODO: Pass the topic manager here also
-  def initialize(self, db: Database, noteManager: NoteManager):
+  def initialize(self):
     # TODO: See stuff from C++ version
-    self.noteManager = noteManager
-    self.db = db
 
     databasePath = getDatabasePath(kAppName, kDatabaseName)
     if self.db.openDatabase(databasePath):
@@ -33,7 +35,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
       if loadingTopicsSuccessful:
         # Create topics
         for topicData in topics:
-          # TODO: Create the topic (use the topic manager to do this)
+          self.topicManager.addTopic(topicData)
           pass
       else:
         logging.error('Error loading topics')

@@ -32,10 +32,9 @@ def main():
   database = Database()
   topicManager = TopicManager()
   noteManager = NoteManager(topicManager)
-  window = PostNoteWindow()
+  window = PostNoteWindow(database, noteManager, topicManager)
 
-  # TODO: Pass topic manager into here also
-  window.initialize(database, noteManager)
+  window.initialize()
 
   # Don't want  to show the window
   # window.hide()
