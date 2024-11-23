@@ -5,9 +5,10 @@ from note_data import NoteData, kInvalidNote, kInvalidTopic
 from note_style import NoteStyle
 from topic_manager import TopicManager
 import datetime
+import logging
 
 class NoteWnd(QtWidgets.QWidget):
-  # TODO: Also pass in database and topic manager
+  # TODO: Also pass in database
   def __init__(self, topicManager: TopicManager, parent: QtWidgets.QWidget = None):
     super(NoteWnd, self).__init__(parent, QtCore.Qt.Tool | QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint)
 
@@ -25,7 +26,8 @@ class NoteWnd(QtWidgets.QWidget):
 
     self.noteStyle = NoteStyle()
 
-    # TODO: More to do here... (see C++ version)
+    self.setMinimumSize(QtCore.QSize(40, 20))
+    self.updateNote()
 
   def initialize(self):
     # TODO: Implement
@@ -43,11 +45,15 @@ class NoteWnd(QtWidgets.QWidget):
     # Most notes will take their appearance settings from the topic to which they belong
     topic = self.topicManager.getTopic(self.topicId)
 
-    textColor = topic.topicStyle.textColor
-    bgColor = topic.topicStyle.backgroundColor
-    transparency = topic.topicStyle.transparency
+    if topic is not None:
+      textColor = topic.topicStyle.textColor
+      bgColor = topic.topicStyle.backgroundColor
+      transparency = topic.topicStyle.transparency
+    else:
+      # Should not happen
+      logging.error(f'[NoteWnd.updateNote] Note topicID is not found in TopicManager: {self.topicId}')
 
-    if self.noteUsesOwnColorScheme:
+    if self.noteUsesOwnColorScheme or topic is None:
       textColor = self.noteStyle.textColor
       bgColor = self.noteStyle.backgroundColor
       transparency = self.noteStyle.transparency
