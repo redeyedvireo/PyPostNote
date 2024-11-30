@@ -2,6 +2,7 @@ import sys
 import os.path
 from pathlib import Path
 import platform
+from PySide6 import QtCore, QtWidgets, QtGui
 
 def getScriptPath():
   if getattr(sys, 'frozen', False):
@@ -35,3 +36,12 @@ def getDatabasePath(applicationName: str, databaseName: str) -> str:
   else:
     print('The application data directory is currently only supported on Windows and Linux')
     return ''
+  
+def copyQRect(src: QtCore.QRect) -> QtCore.QRect:
+  """Makes a deep copy of a QRect.  Simply assigning one QRect to another one will not perform a
+     copy; it will simply assign a reference, so that both rects point to the same QRect.
+
+  Args:
+      src (QtCore.QRect): QRect to copy
+  """
+  return QtCore.QRect(src.topLeft(), src.bottomRight())

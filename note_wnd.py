@@ -30,9 +30,7 @@ class NoteWnd(QtWidgets.QWidget):
     self.setMinimumSize(QtCore.QSize(40, 20))
     self.updateNote()
 
-  def initialize(self):
-    # TODO: Implement
-    self.createButtonBarWidget()
+    QtCore.QTimer.singleShot(100, self.createButtonBarWidget)
 
   def showNote(self):
     self.show()
@@ -45,6 +43,10 @@ class NoteWnd(QtWidgets.QWidget):
     """ Updates the note's appearance. """
     # Most notes will take their appearance settings from the topic to which they belong
     topic = self.topicManager.getTopic(self.topicId)
+
+    bgColor = QtGui.QColor("yellow")
+    textColor = QtGui.QColor("black")
+    transparency = 100
 
     if topic is not None:
       textColor = topic.topicStyle.textColor

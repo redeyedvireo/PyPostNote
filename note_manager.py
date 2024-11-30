@@ -30,9 +30,7 @@ class NoteManager:
   def createPopulatedNote(self, noteData: NoteData):
     """ Creates a fully-populated note.  Used when loading notes from the database.
     """
-    # Create a NoteWnd.  Must call noteWnd.initialize() immediately afterwards.
     newNote = self.createNote(noteData.noteId)
-    newNote.initialize()
 
     newNote.setNoteContents(noteData)
 
