@@ -70,13 +70,51 @@ class Database:
     fieldIndex = queryObj.record().indexOf(fieldName)
 
     return queryObj.value(fieldIndex)
-  
+
+  def saveNote(self, noteData: NoteData) -> bool:
+    """Saves a note to the database.
+
+    Args:
+        noteData (NoteData): NoteData describing the note
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    queryObj = QtSql.QSqlQuery()
+    queryObj.prepare("""update notes set title=?, notetext=?, geometry=?,
+		                          lastupdated=?, topicid=?, usesowncolors=?, alwaysontop=?, textcolor=?,
+                              bgcolor=?, bgtype=?, transparency=? where noteid=?""")
+
+    queryObj.addBindValue(noteData.title)
+    queryObj.addBindValue(noteData.contentsData)
+    queryObj.addBindValue(noteData.geometryData)
+    queryObj.addBindValue(noteData.lastModifiedTime)
+    queryObj.addBindValue(noteData.topicId)
+    queryObj.addBindValue(noteData.usesOwnColors)
+    queryObj.addBindValue(noteData.alwaysOnTop)
+    queryObj.addBindValue(noteData.textColor.rgba())
+    queryObj.addBindValue(noteData.bgColor.rgba())
+    queryObj.addBindValue(noteData.bgType)
+    queryObj.addBindValue(noteData.transparency)
+    queryObj.addBindValue(noteData.noteId)
+
+    queryObj.exec_()
+
+    # Check for errors
+    sqlErr = queryObj.lastError()
+
+    if sqlErr.type() != QtSql.QSqlError.ErrorType.NoError:
+      self.reportError(f'saveNote error: {sqlErr.text()}')
+      return False
+    else:
+      return True
+
   def getNotes(self) -> tuple[bool, list[NoteData]]:
     """ Retrieves notes from the database.
         Returns a tuple consisting of a boolean, indicating success or failure,  and a list of NoteData.
     """
     queryObj = QtSql.QSqlQuery()
-    queryObj.prepare("""select noteid, title, notetext, geometry, added, 
+    queryObj.prepare("""select noteid, title, notetext, geometry, added,
                         lastupdated, topicid, usesowncolors, alwaysontop, textcolor, bgcolor, bgtype,
                         transparency from notes""")
 
@@ -88,7 +126,7 @@ class Database:
     if sqlErr.type() != QtSql.QSqlError.ErrorType.NoError:
       self.reportError(f'getNotes error: {sqlErr.text()}')
       return (False, [])
-    
+
     notes = []
 
     while queryObj.next():
@@ -129,8 +167,8 @@ class Database:
 
     if sqlErr.type() != QtSql.QSqlError.ErrorType.NoError:
       self.reportError(f'getTopics error: {sqlErr.text()}')
-      return (False, [])    
-    
+      return (False, [])
+
     topics = []
 
     while queryObj.next():
