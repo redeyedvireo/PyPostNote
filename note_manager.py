@@ -9,6 +9,8 @@ class NoteManager:
   def __init__(self, topicManager: TopicManager):
     self.noteWndDict = {}     # Maps NOTE_IDs to NoteWnds
     self.topicManager = topicManager
+    self.defaultNoteFontFamily = 'Arial'
+    self.defaultNoteFontSize = 10
 
   def createNote(self, noteId: NOTE_ID) -> NoteWnd:
     # First, check that noteId is not already being used
@@ -16,7 +18,7 @@ class NoteManager:
       # If noteId does already exist, this is an error condition
       logging.error(f'[NoteManager.createNote] Note ID {noteId} already exists in the noteWndDict')
       return
-    
+
     noteWnd = NoteWnd(self.topicManager)
     noteWnd.noteId = noteId
 
@@ -35,4 +37,3 @@ class NoteManager:
     newNote.setNoteContents(noteData)
 
     newNote.showNote()
-    

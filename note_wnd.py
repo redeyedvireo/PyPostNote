@@ -5,6 +5,7 @@ from ui_note_wnd import Ui_NoteWnd
 from note_data import NoteData, kInvalidNote, kInvalidTopic
 from note_style import NoteStyle
 from topic_manager import TopicManager
+from edit_toolbar import EditToolbar
 import datetime
 import logging
 
@@ -12,6 +13,10 @@ class NoteWnd(QtWidgets.QWidget):
   # TODO: Also pass in database
   def __init__(self, topicManager: TopicManager, parent: QtWidgets.QWidget = None):
     super(NoteWnd, self).__init__(parent, QtCore.Qt.Tool | QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint)
+
+    # The modificationAllowed flag prevents various changes to the note as being considered user modifications.  It will be
+    # set to False while the note is being created, and will be set to True once the note is ready for user input.
+    self.modificationAllowed = False
 
     self.ui = Ui_NoteWnd()
     self.ui.setupUi(self)
@@ -24,6 +29,7 @@ class NoteWnd(QtWidgets.QWidget):
     self.topicId = kInvalidTopic
     self.noteUsesOwnColorScheme = False
     self.alwaysOnTop = False
+    self.dirtyFlag = False          # Indicates if the user has made any changes to the note
 
     self.noteStyle = NoteStyle()
 
@@ -32,12 +38,53 @@ class NoteWnd(QtWidgets.QWidget):
 
     QtCore.QTimer.singleShot(100, self.createButtonBarWidget)
 
+  @property
+  def noteData(self) -> NoteData:
+    outNoteData = NoteData()
+
+    outNoteData.noteId = self.noteId
+    outNoteData.geometryData = self.saveGeometry()
+    outNoteData.title = self.windowTitle()
+    outNoteData.contentsData = self.ui.textEdit.toHtml()
+    outNoteData.addedTime = self.noteCreationTime
+    outNoteData.lastModifiedTime = self.lastUpdateTime
+    outNoteData.topicId = self.topicId
+    outNoteData.usesOwnColors = self.noteUsesOwnColorScheme
+    outNoteData.alwaysOnTop = self.alwaysOnTop
+    outNoteData.textColor = self.noteStyle.textColor
+    outNoteData.bgColor = self.noteStyle.backgroundColor
+    outNoteData.bgType = int(self.noteStyle.backgroundType)
+    outNoteData.transparency = self.noteStyle.transparency
+
+  @property
+  def dirty(self) -> bool:
+    return self.dirtyFlag
+
+  @dirty.setter
+  def dirty(self, inDirty: bool):
+    self.dirtyFlag = inDirty
+
+    if inDirty:
+      # If setting the note to dirty, set the modification time
+      self.lastUpdateTime = datetime.datetime.now()
+    else:
+      # If clearing the dirty flag, make sure the text edit's modified flag is cleared also
+      self.ui.textEdit.document().setModified(False)
+
   def showNote(self):
     self.show()
 
     # Activate the note
     self.activateWindow()
     self.raise_()
+
+    # When a note is shown, and thus ready for user input, it is open to allowing changes to be considered
+    # as user modifications.
+    self.modificationAllowed = True
+
+  def hideNote(self):
+    # When a note is hidden, any modifications made are not to be considered as user modifications.
+    self.modificationAllowed = False
 
   def updateNote(self):
     """ Updates the note's appearance. """
@@ -90,6 +137,8 @@ class NoteWnd(QtWidgets.QWidget):
     self.noteStyle.transparency = noteData.transparency
 
     self.updateNote()
+
+    self.ui.textEdit.document().setModified(False)
 
 
   def setNoteTitle(self, title: str):
@@ -147,3 +196,19 @@ class NoteWnd(QtWidgets.QWidget):
       # TODO: Update the note in the database
       # self.db.updateNote(self)
       self.updateNote()
+
+  @QtCore.Slot()
+  def on_textEdit_textChanged(self):
+    # Use this signal to update the "last update" date/time, but note that this is tricky,
+    # because this signal is called multiple times when on startup when notes are read from
+    # the database and displayed.  The modificationAllowed flag is an attempt to filter out
+    # system modifications so that the lastUpdateTime is only for user modifications.
+    if self.modificationAllowed:
+      if self.ui.textEdit.document().isModified():
+        print('Note has been changed')
+        self.dirty = True
+
+  @QtCore.Slot()
+  def on_textEdit_TE_LostFocus(self):
+    if self.dirty:
+      print('Dirty note lost focus')
