@@ -11,7 +11,7 @@ kInvalidTopic = -1
 class NoteData:
   def __init__(self):
     self.noteId = kInvalidNote
-    self.geometryData = None
+    self.geometryData: QtCore.QByteArray = QtCore.QByteArray()
     self.title = ''
     self.contentsData = ''
     self.addedTime = datetime.datetime.now()		# When created
