@@ -64,6 +64,8 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.setWindowIcon(icon)
     self.trayIcon.setToolTip('PyPostNote')
 
+    self.trayIcon.activated.connect(self.onActivated)
+
   def createNoteMenu(self):
     self.trayIconMenu = QtWidgets.QMenu(self)
 
@@ -76,6 +78,10 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
     self.trayIconMenu.addMenu(self.noteSizeMenu)
 
+    self.trayIconMenu.addAction(self.ui.actionSave_All_Notes)
+    self.trayIconMenu.addAction(self.ui.actionHide_All_Notes)
+    self.trayIconMenu.addAction(self.ui.actionShow_All_Notes)
+
     # Create note list menu
     self.noteListMenu = QtWidgets.QMenu('Show Note', self)
     self.trayIconMenu.addMenu(self.noteListMenu)
@@ -84,9 +90,6 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.trayIconMenu.addAction(self.ui.actionEdit_Topics)
     self.trayIconMenu.addAction(self.ui.actionPreferences)
 
-    self.trayIconMenu.addAction(self.ui.actionSave_All_Notes)
-    self.trayIconMenu.addAction(self.ui.actionHide_All_Notes)
-    self.trayIconMenu.addAction(self.ui.actionShow_All_Notes)
 
     self.trayIconMenu.addSeparator()
     self.trayIconMenu.addAction(self.ui.actionAbout_Qt)
@@ -99,6 +102,34 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.trayIcon.show()
 
   # ************ SLOTS ************
+
+  def onActivated(self, reason: QtWidgets.QSystemTrayIcon.ActivationReason):
+    if reason == QtWidgets.QSystemTrayIcon.ActivationReason.Context:
+      # The tray icon was right-clicked
+      self.noteListMenu.clear()
+
+      ids = self.noteManager.allNoteIds()
+
+      for id in ids:
+        note = self.noteManager.getNote(id)
+
+        if note is not None:
+          title = note.noteTitle()
+          action = self.noteListMenu.addAction(title, self.onShowNote)
+          action.setData(id)
+
+    elif reason == QtWidgets.QSystemTrayIcon.ActivationReason.DoubleClick:
+      # The tray icon was dobule-clicked - create a new note
+      # TODO: Implement
+      print('Implement tray double-click event')
+
+  @QtCore.Slot()
+  def onShowNote(self):
+    sender = self.sender()
+
+    if type(sender) is QtGui.QAction:
+      noteId = sender.data()
+      self.noteManager.showNote(noteId)
 
   @QtCore.Slot()
   def on_actionSmall_triggered(self):

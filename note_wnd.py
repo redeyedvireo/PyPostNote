@@ -71,6 +71,9 @@ class NoteWnd(QtWidgets.QWidget):
       # If clearing the dirty flag, make sure the text edit's modified flag is cleared also
       self.ui.textEdit.document().setModified(False)
 
+  def noteTitle(self):
+    return self.windowTitle()
+
   def showNote(self):
     self.show()
 
