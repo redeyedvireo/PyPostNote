@@ -6,6 +6,16 @@ class EditToolbar(QtWidgets.QWidget):
   toolbarClosing = QtCore.Signal()
   fontSizeChanged = QtCore.Signal(int)
   fontFamilyChanged = QtCore.Signal(str)
+  leftAlignTriggered = QtCore.Signal()
+  centerAlignTriggered = QtCore.Signal()
+  rightAlignTriggered = QtCore.Signal()
+  boldTriggered = QtCore.Signal()
+  italicTriggered = QtCore.Signal()
+  underlineTriggered = QtCore.Signal()
+  horizontalLineTriggered = QtCore.Signal()
+  bulletListTriggered = QtCore.Signal()
+  numberListTriggered = QtCore.Signal()
+  tableTriggered = QtCore.Signal(int, int)      # Number of rows, number of columns
 
   def __init__(self, parent: QtWidgets.QWidget):
     super(EditToolbar, self).__init__(parent, QtCore.Qt.Tool | QtCore.Qt.MSWindowsFixedSizeDialogHint)
@@ -96,3 +106,65 @@ class EditToolbar(QtWidgets.QWidget):
 
     fontFamily = self.ui.fontComboBox.currentText()
     self.fontFamilyChanged.emit(fontFamily)
+
+  @QtCore.Slot()
+  def on_leftAlignButton_clicked(self):
+    self.leftAlignTriggered.emit()
+    self.ui.leftAlignButton.clearFocus()
+    self.clearFocus()
+
+  @QtCore.Slot()
+  def on_centerAlignButton_clicked(self):
+    self.centerAlignTriggered.emit()
+    self.ui.centerAlignButton.clearFocus()
+    self.clearFocus()
+
+  @QtCore.Slot()
+  def on_rightAlignButton_clicked(self):
+    self.rightAlignTriggered.emit()
+    self.ui.rightAlignButton.clearFocus()
+    self.clearFocus()
+
+  @QtCore.Slot()
+  def on_boldButton_clicked(self):
+    self.boldTriggered.emit()
+    self.ui.boldButton.clearFocus()
+    self.clearFocus()
+
+  @QtCore.Slot()
+  def on_italicButton_clicked(self):
+    self.italicTriggered.emit()
+    self.ui.italicButton.clearFocus()
+    self.clearFocus()
+
+  @QtCore.Slot()
+  def on_underlineButton_clicked(self):
+    self.underlineTriggered.emit()
+    self.ui.underlineButton.clearFocus()
+    self.clearFocus()
+
+  @QtCore.Slot()
+  def on_horizontalLineButton_clicked(self):
+    self.horizontalLineTriggered.emit()
+    self.ui.horizontalLineButton.clearFocus()
+    self.clearFocus()
+
+  @QtCore.Slot()
+  def on_bulletListInsertButton_clicked(self):
+    self.bulletListTriggered.emit()
+    self.ui.bulletListInsertButton.clearFocus()
+    self.clearFocus()
+
+  @QtCore.Slot()
+  def on_numberListInsertButton_clicked(self):
+    self.numberListTriggered.emit()
+    self.ui.numberListInsertButton.clearFocus()
+    self.clearFocus()
+
+  @QtCore.Slot()
+  def on_tableInsertButton_clicked(self):
+    # TODO: Need a dialog to ask how many rows and columns
+    self.tableTriggered.emit(2, 2)
+    self.ui.tableInsertButton.clearFocus()
+    self.clearFocus()
+
