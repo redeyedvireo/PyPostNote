@@ -12,6 +12,22 @@ class NoteManager:
     self.defaultNoteFontFamily = 'Arial'
     self.defaultNoteFontSize = 10
 
+  def allNoteIds(self) -> list[NOTE_ID]:
+    """Returns a list of all note IDs
+
+    Returns:
+        list[NOTE_ID]: List of note IDs
+    """
+    return self.noteWndDict.keys()
+
+  def getNote(self, noteId: NOTE_ID) -> NoteWnd | None:
+    return self.noteWndDict[noteId] if noteId in self.noteWndDict else None
+
+  def showNote(self, noteId: NOTE_ID):
+    if noteId in self.noteWndDict:
+      note = self.noteWndDict[noteId]
+      note.showNote()
+
   def createNote(self, noteId: NOTE_ID) -> NoteWnd:
     # First, check that noteId is not already being used
     if noteId in self.noteWndDict:
