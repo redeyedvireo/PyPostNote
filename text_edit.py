@@ -73,8 +73,17 @@ class TextEdit(QtWidgets.QTextEdit):
       return super(TextEdit, self).insertFromMimeData(source)
 
   def updateFontControls(self):
-    # TODO: Implement
-    print('updateFontControls')
+    if self.editToolbar is None:
+      return
+
+    selectionCursor = self.textCursor()
+    selectionFormat = selectionCursor.charFormat()
+
+    fontFamily = selectionFormat.fontFamily()
+    self.editToolbar.setFontFamily(fontFamily)
+
+    fontSize = selectionFormat.fontPointSize()
+    self.editToolbar.setFontSize(fontSize)
 
   def getCursorAndSelectionFormat(self) -> tuple[QtGui.QTextCursor, QtGui.QTextCharFormat]:
     selectionCursor = self.textCursor()
@@ -116,17 +125,35 @@ class TextEdit(QtWidgets.QTextEdit):
     self.editToolbar.tableTriggered.connect(self.onTableTriggered)
 
   def onToDefaultFontTriggered(self):
-    if self.editToolbar is None:
-      return
-
     selectionCursor = self.textCursor()
+
+    doc = self.document()
+
+    # Select entire document
+    selectionCursor.select(QtGui.QTextCursor.SelectionType.Document)
     selectionFormat = selectionCursor.charFormat()
 
-    fontFamily = selectionFormat.fontFamily()
-    self.editToolbar.setFontFamily(fontFamily)
+    tempCharFormat = QtGui.QTextCharFormat()
 
-    fontSize = selectionFormat.fontPointSize()
-    self.editToolbar.setFontSize(fontSize)
+    tempCharFormat.setFont(doc.defaultFont())
+    tempCharFormat.clearForeground()
+    tempCharFormat.clearBackground()
+
+    selectionFormat.clearBackground()   # Clear background color, so it uses the note's background color
+    selectionFormat.clearForeground()
+
+    selectionCursor.setCharFormat(tempCharFormat)
+
+    # Clear the colors of the block format
+    selectionBlockFormat = QtGui.QTextBlockFormat()
+
+    selectionBlockFormat = selectionCursor.blockFormat()
+    selectionBlockFormat.clearForeground()
+    selectionBlockFormat.clearBackground()
+
+    selectionCursor.clearSelection()      # Deselect the text
+
+    self.setTextCursor(selectionCursor)
 
   @QtCore.Slot()
   def on_selectionChanged(self):
