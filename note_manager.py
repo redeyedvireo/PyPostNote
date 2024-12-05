@@ -7,7 +7,7 @@ from topic_manager import TopicManager
 
 class NoteManager:
   def __init__(self, topicManager: TopicManager):
-    self.noteWndDict = {}     # Maps NOTE_IDs to NoteWnds
+    self.noteWndDict: dict[NOTE_ID, NoteWnd] = {}     # Maps NOTE_IDs to NoteWnds
     self.topicManager = topicManager
     self.defaultNoteFontFamily = 'Arial'
     self.defaultNoteFontSize = 10
@@ -27,6 +27,14 @@ class NoteManager:
     if noteId in self.noteWndDict:
       note = self.noteWndDict[noteId]
       note.showNote()
+
+  def showAllNotes(self):
+    for note in self.noteWndDict.values():
+      note.showNote()
+
+  def hideAllNotes(self):
+    for note in self.noteWndDict.values():
+      note.hideNote()
 
   def createNote(self, noteId: NOTE_ID) -> NoteWnd:
     # First, check that noteId is not already being used

@@ -88,6 +88,7 @@ class NoteWnd(QtWidgets.QWidget):
   def hideNote(self):
     # When a note is hidden, any modifications made are not to be considered as user modifications.
     self.modificationAllowed = False
+    self.hide()
 
   def updateNote(self):
     """ Updates the note's appearance. """
