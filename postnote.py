@@ -173,13 +173,11 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot()
   def on_actionHide_All_Notes_triggered(self):
-    # TODO: Implement
-    print('Hide all notes')
+    self.noteManager.hideAllNotes()
 
   @QtCore.Slot()
   def on_actionShow_All_Notes_triggered(self):
-    # TODO: Implement
-    print('Show all notes')
+    self.noteManager.showAllNotes()
 
   @QtCore.Slot()
   def on_actionAbout_Qt_triggered(self):
