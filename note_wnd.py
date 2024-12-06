@@ -5,7 +5,6 @@ from ui_note_wnd import Ui_NoteWnd
 from note_data import NoteData, kInvalidNote, kInvalidTopic
 from note_style import NoteStyle
 from topic_manager import TopicManager
-from edit_toolbar import EditToolbar
 import datetime
 import logging
 
@@ -17,6 +16,8 @@ class NoteWnd(QtWidgets.QWidget):
     # The modificationAllowed flag prevents various changes to the note as being considered user modifications.  It will be
     # set to False while the note is being created, and will be set to True once the note is ready for user input.
     self.modificationAllowed = False
+
+    self.buttonBarWidget = None
 
     self.ui = Ui_NoteWnd()
     self.ui.setupUi(self)
@@ -170,6 +171,53 @@ class NoteWnd(QtWidgets.QWidget):
     self.buttonBarWidget.setTopicMenu(self.topicMenu)
 
     # TODO: Connect signals (see C++ version)
+
+  # TODO: Instead of doing it this way, try to install an event filter on the window.  To do so,
+  #       Google: "pyside6 detect click on title bar"
+  # def nativeEvent(self, eventType: QtCore.QByteArray, message):
+  #   return_value, result = super().nativeEvent(eventType, message)
+
+  #   if eventType == b'windows_generic_MSG':
+  #     msg = MSG.from_address(message.__int__())
+  #     print(f'nativeEvent: {eventType}  --  {msg}')
+
+  #     WM_LBUTTONDOWN = 0x0201
+  #     HTCAPTION = 2
+
+  #     if message == WM_LBUTTONDOWN:
+  #       if message.wParam == HTCAPTION:
+  #         yPos = (message.lParam >> 16) & 0x0000ffff
+  #         xPos = message.lParam & 0x0000ffff
+
+  #         hitPt = QtCore.QPoint(xPos, yPos)
+  #         # self.onContextMenu(hitPt)
+  #         print(f'hitPt: {hitPt}')
+  #         return True
+
+  #   return False
+
+  def moveEvent(self, event: QtGui.QMoveEvent):
+    # Moving the note consitutes making it dirty.  However, the note won't be
+    # saved immediately; it will be saved at the next autosave timer event,
+    # or if the note loses focus.
+    self.dirty = True
+
+    return super(NoteWnd, self).moveEvent(event)
+
+  def resizeEvent(self, event):
+    # Resizing the note consitutes making it dirty.  However, the note won't be
+    # saved immediately; it will be saved at the next autosave timer event,
+    # or if the note loses focus.
+    self.dirty = True
+
+    result = super().resizeEvent(event)
+
+    # TODO: Resizing the button bar breaks it.  Breakage is similar to when
+    #       the rect was not being copied.
+    if self.buttonBarWidget is not None:
+      self.buttonBarWidget.resizeButtonBar(self.ui.textEdit.rect())
+
+    return result
 
   @QtCore.Slot()
   def populateTopicMenu(self):

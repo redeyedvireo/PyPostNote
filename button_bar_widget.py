@@ -1,6 +1,6 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from ui_button_bar_widget import Ui_ButtonBarWidget
-from util import copyQRect
+from util import copyQRect, copyQSize
 
 kHideInterval = 1500
 kGrowWaitTime =	100
@@ -39,7 +39,7 @@ class ButtonBarWidget(QtWidgets.QWidget):
     self.growAnimator = QtCore.QPropertyAnimation(self, b'geometry')
     self.growAnimator.setDuration(kAnimateInterval)
     self.growAnimator.finished.connect(self.onGrowFinished)
-    
+
   def enterEvent(self, event: QtCore.QEvent):
     if self.isBarShrunk():
       # The bar is hidden.  Go ahead and grow it, after a brief waiting period.
@@ -58,12 +58,15 @@ class ButtonBarWidget(QtWidgets.QWidget):
 
   def setTopicMenu(self, menu: QtWidgets.QMenu):
     self.ui.topicButton.setMenu(menu)
-    
+
+  def resizeButtonBar(self, textEditRect: QtCore.QRect):
+    self.positionWidget(textEditRect)
+
   def positionWidget(self, textEditRect: QtCore.QRect):
     if not self.initialSize.isValid():
-      self.initialSize = self.size()
+      self.initialSize = copyQSize((self.size()))
 
-    barSize = self.initialSize
+    barSize = copyQSize(self.initialSize)
 
     kBorder = 5
 
@@ -97,7 +100,7 @@ class ButtonBarWidget(QtWidgets.QWidget):
 
   def showWidgets(self):
     self.ui.deleteButton.show()
-    self.ui.propertiesButton.show()    
+    self.ui.propertiesButton.show()
 
   def onGrowWaitTimeout(self):
     # If the mouse is still within the widget, go ahead and grow the bar
@@ -107,7 +110,7 @@ class ButtonBarWidget(QtWidgets.QWidget):
   def isMouseInWidget(self):
     mousePos = QtGui.QCursor.pos()
     widgetRect = self.rect()
-    
+
     ul = widgetRect.topLeft()
     lr = widgetRect.bottomRight()
 
@@ -117,7 +120,7 @@ class ButtonBarWidget(QtWidgets.QWidget):
     widgetRectGlobal = QtCore.QRect()
     widgetRectGlobal.setTopLeft(ulGlobal)
     widgetRectGlobal.setBottomRight(lrGlobal)
-    
+
     return widgetRectGlobal.contains(mousePos)
 
   def isBarGrown(self):

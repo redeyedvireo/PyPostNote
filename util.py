@@ -26,17 +26,17 @@ def getDatabasePath(applicationName: str, databaseName: str) -> str:
     # If the APPDATA environment variable doesn't exist, the application directory is used.
     directory = os.getenv('APPDATA', getScriptPath())
     return os.path.join(directory, applicationName, databaseName)
-  
+
   elif platform.system() == 'Linux':
     # On Linux, use "~/.PyPostNote/Notes.db"
     homeDirObj = Path.home()
     appDataDir = homeDirObj / f'.{applicationName}' / databaseName
     return os.fspath(appDataDir)
-  
+
   else:
     print('The application data directory is currently only supported on Windows and Linux')
     return ''
-  
+
 def copyQRect(src: QtCore.QRect) -> QtCore.QRect:
   """Makes a deep copy of a QRect.  Simply assigning one QRect to another one will not perform a
      copy; it will simply assign a reference, so that both rects point to the same QRect.
@@ -45,3 +45,15 @@ def copyQRect(src: QtCore.QRect) -> QtCore.QRect:
       src (QtCore.QRect): QRect to copy
   """
   return QtCore.QRect(src.topLeft(), src.bottomRight())
+
+def copyQSize(src: QtCore.QSize) -> QtCore.QSize:
+  """Makes a deep copy of a QSize.  Simply assigning one QSize to another one will not perform a
+     copy; it will simply assign a reference, so that both sizes point to the same QSize.
+
+  Args:
+      src (QtCore.QSize): QSize to copy
+
+  Returns:
+      QtCore.QSize: A deep copy of the QSize object.
+  """
+  return QtCore.QSize(src.width(), src.height())
