@@ -1,8 +1,11 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from database import Database
+from note_data import TOPIC_ID
 from note_manager import NoteManager
+from topic import Topic
 from topic_manager import TopicManager
 from ui_postnote import Ui_PostNoteClass
+from edit_topics_dialog import EditTopicsDialog
 import logging
 
 from util import getDatabasePath
@@ -22,6 +25,10 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.topicManager = topicManager
     self.db = db
 
+    self.topicManager.topicAdded.connect(self.onNewTopicAdded)
+    self.topicManager.topicUpdated.connect(self.onTopicUpdated)
+    self.topicManager.topicDeleted.connect(self.onTopicDeleted)
+
     self.setIcon()
     self.createNoteMenu()
 
@@ -35,8 +42,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
       if loadingTopicsSuccessful:
         # Create topics
         for topicData in topics:
-          self.topicManager.addTopic(topicData)
-          pass
+          self.topicManager.addTopicFromTopicData(topicData)
       else:
         logging.error('Error loading topics')
         # TODO: Pop up an error dialog
@@ -103,6 +109,22 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   # ************ SLOTS ************
 
+  @QtCore.Slot(Topic)
+  def onNewTopicAdded(self, topic: Topic):
+    # TODO: Implement
+    print(f'onNewTopicAdded: {topic.topicName}')
+
+  @QtCore.Slot(Topic)
+  def onTopicUpdated(self, topic: Topic):
+    # TODO: Implement
+    print(f'onTopicUpdated: {topic.topicName}')
+
+  @QtCore.Slot(int)
+  def onTopicDeleted(self, topicId: TOPIC_ID):
+    # TODO: Implement
+    print(f'onTopicDeleted: {topicId}')
+
+
   def onActivated(self, reason: QtWidgets.QSystemTrayIcon.ActivationReason):
     if reason == QtWidgets.QSystemTrayIcon.ActivationReason.Context:
       # The tray icon was right-clicked
@@ -158,8 +180,8 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot()
   def on_actionEdit_Topics_triggered(self):
-    # TODO: Implement
-    print('Edit topics')
+    dlg = EditTopicsDialog(self, self.topicManager, self.noteManager)
+    dlg.exec_()
 
   @QtCore.Slot()
   def on_actionPreferences_triggered(self):
