@@ -2,7 +2,7 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from button_bar_widget import ButtonBarWidget
 from text_edit import TextEdit
 from ui_note_wnd import Ui_NoteWnd
-from note_data import NoteData, kInvalidNote, kInvalidTopic
+from note_data import TOPIC_ID, NoteData, kInvalidNote, kInvalidTopic
 from note_style import NoteStyle
 from topic_manager import TopicManager
 import datetime
@@ -27,7 +27,7 @@ class NoteWnd(QtWidgets.QWidget):
     self.noteId = kInvalidNote
     self.noteCreationTime = datetime.datetime.now()
     self.lastUpdateTime = datetime.datetime.now()
-    self.topicId = kInvalidTopic
+    self._topicId = kInvalidTopic
     self.noteUsesOwnColorScheme = False
     self.alwaysOnTop = False
     self.dirtyFlag = False          # Indicates if the user has made any changes to the note
@@ -49,7 +49,7 @@ class NoteWnd(QtWidgets.QWidget):
     outNoteData.contentsData = self.ui.textEdit.toHtml()
     outNoteData.addedTime = self.noteCreationTime
     outNoteData.lastModifiedTime = self.lastUpdateTime
-    outNoteData.topicId = self.topicId
+    outNoteData.topicId = self._topicId
     outNoteData.usesOwnColors = self.noteUsesOwnColorScheme
     outNoteData.alwaysOnTop = self.alwaysOnTop
     outNoteData.textColor = self.noteStyle.textColor
@@ -71,6 +71,18 @@ class NoteWnd(QtWidgets.QWidget):
     else:
       # If clearing the dirty flag, make sure the text edit's modified flag is cleared also
       self.ui.textEdit.document().setModified(False)
+
+  @property
+  def topicId(self):
+    return self._topicId
+
+  @topicId.setter
+  def topicId(self, value: TOPIC_ID):
+    self._topicId = value
+    self.noteUsesOwnColorScheme = False
+
+    self.updateNote()
+    self.dirty = True
 
   def noteTitle(self):
     return self.windowTitle()
@@ -132,7 +144,7 @@ class NoteWnd(QtWidgets.QWidget):
     self.noteId = noteData.noteId
     self.noteCreationTime = noteData.addedTime
     self.lastUpdateTime = noteData.lastModifiedTime
-    self.topicId = noteData.topicId
+    self._topicId = noteData.topicId    # Don't use the setter here, to avoid the update triggered by doing so
     self.noteUsesOwnColorScheme = noteData.usesOwnColors
     self.alwaysOnTop = noteData.alwaysOnTop
 
@@ -244,7 +256,7 @@ class NoteWnd(QtWidgets.QWidget):
   def onSetNewTopic(self):
     sender = self.sender()
     if type(sender) is QtGui.QAction:
-      self.topicId = sender.data()
+      self._topicId = sender.data()
       # TODO: Update the note in the database
       # self.db.updateNote(self)
       self.updateNote()
