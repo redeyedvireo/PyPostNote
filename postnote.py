@@ -2,20 +2,23 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from database import Database
 from note_data import TOPIC_ID
 from note_manager import NoteManager
+from preferences import Preferences
+from preferences_dlg import PreferencesDlg
 from topic import Topic
 from topic_manager import TopicManager
 from ui_postnote import Ui_PostNoteClass
 from edit_topics_dialog import EditTopicsDialog
 import logging
 
-from util import getDatabasePath
+from util import getDatabasePath, getPrefsPath
 
 kAppName = 'PyPostNote'
 kDatabaseName = 'Notes.db'
+kPrefsName = 'PyPostNote.ini'
 
 class PostNoteWindow(QtWidgets.QMainWindow):
 
-  def __init__(self, db: Database, noteManager: NoteManager, topicManager: TopicManager):
+  def __init__(self, db: Database, noteManager: NoteManager, topicManager: TopicManager, preferences: Preferences):
     super(PostNoteWindow, self).__init__()
 
     self.ui = Ui_PostNoteClass()
@@ -24,6 +27,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.noteManager = noteManager
     self.topicManager = topicManager
     self.db = db
+    self.preferences = preferences
 
     self.topicManager.topicAdded.connect(self.onNewTopicAdded)
     self.topicManager.topicUpdated.connect(self.onTopicUpdated)
@@ -34,6 +38,10 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   def initialize(self):
     # TODO: See stuff from C++ version
+
+    preferencesPath = getPrefsPath(kAppName, kPrefsName)
+
+    self.preferences.readPrefsFile(preferencesPath)
 
     databasePath = getDatabasePath(kAppName, kDatabaseName)
     if self.db.openDatabase(databasePath):
@@ -56,6 +64,10 @@ class PostNoteWindow(QtWidgets.QMainWindow):
       else:
         logging.error('Error loading notes')
         # TODO: Pop up an error dialog
+
+  def updateAutoShutdown(self):
+    # TODO: Implement
+    pass
 
   def setIcon(self):
     systemTrayAvailable = QtWidgets.QSystemTrayIcon.isSystemTrayAvailable()
@@ -185,8 +197,13 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot()
   def on_actionPreferences_triggered(self):
-    # TODO: Implement
-    print('Preferences')
+    dlg = PreferencesDlg(self.noteManager, self.preferences, self)
+
+    dlg.exec_()
+
+    self.updateAutoShutdown()
+
+    # TODO: update other things, like the auto-save timer, and whatever else needs to be updated
 
   @QtCore.Slot()
   def on_actionSave_All_Notes_triggered(self):
@@ -212,5 +229,4 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot()
   def on_actionExit_PostNote_triggered(self):
-    print('on_actionExit_PostNote_triggered')
     QtCore.QCoreApplication.quit()

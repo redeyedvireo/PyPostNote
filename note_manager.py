@@ -1,16 +1,35 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from note_data import NoteData, NOTE_ID
 from note_wnd import NoteWnd
+from preferences import Preferences
+from topic_manager import TopicManager
 import logging
 
-from topic_manager import TopicManager
-
 class NoteManager:
-  def __init__(self, topicManager: TopicManager):
+  def __init__(self, topicManager: TopicManager, preferences: Preferences):
     self.noteWndDict: dict[NOTE_ID, NoteWnd] = {}     # Maps NOTE_IDs to NoteWnds
     self.topicManager = topicManager
-    self.defaultNoteFontFamily = 'Arial'
-    self.defaultNoteFontSize = 10
+    self.preferences = preferences
+
+    self.defaultNoteFontSize = self.preferences.defaultFontSize
+
+  @property
+  def defaultNoteFontFamily(self) -> str:
+    return self.preferences.defaultFontFamily
+
+  @defaultNoteFontFamily.setter
+  def defaultNoteFontFamily(self, fontFamily: str):
+    self.preferences.defaultFontFamily = fontFamily
+    # TODO: Save preferences?
+
+  @property
+  def defaultNoteFontSize(self) -> int:
+    return self.preferences.defaultFontSize
+
+  @defaultNoteFontSize.setter
+  def defaultNoteFontSize(self, size: int):
+    self.preferences.defaultFontSize = size
+    # TODO: Save preferences?
 
   def allNoteIds(self) -> list[NOTE_ID]:
     """Returns a list of all note IDs
