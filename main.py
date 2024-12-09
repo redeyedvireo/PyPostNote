@@ -3,6 +3,7 @@ import sys
 import os.path
 import logging
 from logging.handlers import RotatingFileHandler
+from preferences import Preferences
 from util import getScriptPath
 from postnote import PostNoteWindow
 from database import Database
@@ -27,12 +28,13 @@ def main():
 
   app = QtWidgets.QApplication([])
 
-  logging.info("PyPostNote startig up...")
+  logging.info("PyPostNote starting up...")
 
+  preferences = Preferences()
   database = Database()
   topicManager = TopicManager()
-  noteManager = NoteManager(topicManager)
-  window = PostNoteWindow(database, noteManager, topicManager)
+  noteManager = NoteManager(topicManager, preferences)
+  window = PostNoteWindow(database, noteManager, topicManager, preferences)
 
   window.initialize()
 

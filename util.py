@@ -37,6 +37,24 @@ def getDatabasePath(applicationName: str, databaseName: str) -> str:
     print('The application data directory is currently only supported on Windows and Linux')
     return ''
 
+def getPrefsPath(applicationName: str, prefsFileName: str) -> str:
+  """ Returns the full path to the prefs file. """
+  if platform.system() == 'Windows':
+    # This attempts to use whatever directory is in the APPDATA environment variable, if it exists.
+    # If the APPDATA environment variable doesn't exist, the application directory is used.
+    directory = os.getenv('APPDATA', getScriptPath())
+    return os.path.join(directory, applicationName, prefsFileName)
+
+  elif platform.system() == 'Linux':
+    # On Linux, use "~/.PyPostNote/PyPostNote.ini"
+    homeDirObj = Path.home()
+    appDataDir = homeDirObj / f'.{applicationName}' / prefsFileName
+    return os.fspath(appDataDir)
+
+  else:
+    print('The application data directory is currently only supported on Windows and Linux')
+    return ''
+
 def copyQRect(src: QtCore.QRect) -> QtCore.QRect:
   """Makes a deep copy of a QRect.  Simply assigning one QRect to another one will not perform a
      copy; it will simply assign a reference, so that both rects point to the same QRect.
