@@ -10,7 +10,8 @@ import datetime
 import logging
 
 class NoteWnd(QtWidgets.QWidget):
-  # TODO: Also pass in database
+  saveNote = QtCore.Signal(NoteData)
+
   def __init__(self, topicManager: TopicManager, parent: QtWidgets.QWidget = None):
     super(NoteWnd, self).__init__(parent, QtCore.Qt.Tool | QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint)
 
@@ -259,9 +260,9 @@ class NoteWnd(QtWidgets.QWidget):
     sender = self.sender()
     if type(sender) is QtGui.QAction:
       self._topicId = sender.data()
-      # TODO: Update the note in the database
-      # self.db.updateNote(self)
       self.updateNote()
+      self.saveNote.emit(self.noteData)
+      self.dirty = False
 
   def onPropertiesDlg(self):
     dlg = NotePropertiesDlg(self.topicManager, self.noteData, self)
@@ -271,6 +272,7 @@ class NoteWnd(QtWidgets.QWidget):
     if result == QtWidgets.QDialog.DialogCode.Accepted:
       # Set note with the data from the dialog
       self.noteData = dlg.noteData
+      self.saveNote.emit(self.noteData)
 
   @QtCore.Slot()
   def on_textEdit_textChanged(self):
@@ -286,4 +288,6 @@ class NoteWnd(QtWidgets.QWidget):
   @QtCore.Slot()
   def on_textEdit_TE_LostFocus(self):
     if self.dirty:
-      print('Dirty note lost focus')
+      # If the note is dirty and loses focus, save it
+      self.saveNote.emit(self.noteData)
+      self.dirty = False

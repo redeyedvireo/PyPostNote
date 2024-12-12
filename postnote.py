@@ -1,7 +1,8 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from database import Database
-from note_data import TOPIC_ID
+from note_data import TOPIC_ID, NoteData
 from note_manager import NoteManager
+from note_wnd import NoteWnd
 from preferences import Preferences
 from preferences_dlg import PreferencesDlg
 from topic import Topic
@@ -28,6 +29,8 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.topicManager = topicManager
     self.db = db
     self.preferences = preferences
+
+    self.noteManager.saveNote.connect(self.onSaveNote)
 
     self.topicManager.topicAdded.connect(self.onNewTopicAdded)
     self.topicManager.topicUpdated.connect(self.onTopicUpdated)
@@ -61,10 +64,14 @@ class PostNoteWindow(QtWidgets.QMainWindow):
         # Create the note windows
         for note in notes:
           noteWnd = self.noteManager.createPopulatedNote(note)
-          # TODO: Connect to any signals the note might have, such as a signal to launch the topics editor.
+          # Connect to any signals the note might have, such as a signal to launch the topics editor.
+          self.connectNoteSignals(noteWnd)
       else:
         logging.error('Error loading notes')
         # TODO: Pop up an error dialog
+
+  def connectNoteSignals(self, noteWnd: NoteWnd):
+    noteWnd.saveNote.connect(self.onSaveNote)
 
   def updateAutoShutdown(self):
     # TODO: Implement
@@ -166,24 +173,35 @@ class PostNoteWindow(QtWidgets.QMainWindow):
       noteId = sender.data()
       self.noteManager.showNote(noteId)
 
+  @QtCore.Slot(NoteData)
+  def onSaveNote(self, noteData: NoteData):
+    success = self.db.saveNote(noteData)
+    if not success:
+      logging.error(f'Error saving note {noteData.title} (ID: {noteData.noteId})')
+      # TODO: Show error dialog?
+
   @QtCore.Slot()
   def on_actionSmall_triggered(self):
     # TODO: Implement
+    # TODO: call connectNoteSignals
     print('Create small note')
 
   @QtCore.Slot()
   def on_actionMedium_triggered(self):
     # TODO: Implement
+    # TODO: call connectNoteSignals
     print('Create medium note')
 
   @QtCore.Slot()
   def on_actionLarge_triggered(self):
     # TODO: Implement
+    # TODO: call connectNoteSignals
     print('Create large note')
 
   @QtCore.Slot()
   def on_actionExtra_Large_triggered(self):
     # TODO: Implement
+    # TODO: call connectNoteSignals
     print('Create extra large note')
 
   @QtCore.Slot()
@@ -208,8 +226,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot()
   def on_actionSave_All_Notes_triggered(self):
-    # TODO: Implement
-    print('Save all notes')
+    self.noteManager.saveAllNotes()
 
   @QtCore.Slot()
   def on_actionHide_All_Notes_triggered(self):
