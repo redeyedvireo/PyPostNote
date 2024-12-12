@@ -81,20 +81,21 @@ class Database:
         bool: True if successful, False otherwise
     """
     queryObj = QtSql.QSqlQuery()
-    queryObj.prepare("""update notes set title=?, notetext=?, geometry=?,
+    queryObj.prepare("""update notes set title=?, notetext=?, geometry=?, added=?,
 		                          lastupdated=?, topicid=?, usesowncolors=?, alwaysontop=?, textcolor=?,
                               bgcolor=?, bgtype=?, transparency=? where noteid=?""")
 
     queryObj.addBindValue(noteData.title)
     queryObj.addBindValue(noteData.contentsData)
     queryObj.addBindValue(noteData.geometryData)
-    queryObj.addBindValue(noteData.lastModifiedTime)
+    queryObj.addBindValue(noteData.addedTime.timestamp())
+    queryObj.addBindValue(noteData.lastModifiedTime.timestamp())
     queryObj.addBindValue(noteData.topicId)
     queryObj.addBindValue(noteData.usesOwnColors)
     queryObj.addBindValue(noteData.alwaysOnTop)
     queryObj.addBindValue(noteData.textColor.rgba())
     queryObj.addBindValue(noteData.bgColor.rgba())
-    queryObj.addBindValue(noteData.bgType)
+    queryObj.addBindValue(noteData.bgType.value)
     queryObj.addBindValue(noteData.transparency)
     queryObj.addBindValue(noteData.noteId)
 

@@ -5,8 +5,12 @@ from preferences import Preferences
 from topic_manager import TopicManager
 import logging
 
-class NoteManager:
+class NoteManager(QtCore.QObject):
+  saveNote = QtCore.Signal(NoteData)
+
   def __init__(self, topicManager: TopicManager, preferences: Preferences):
+    super().__init__()
+
     self.noteWndDict: dict[NOTE_ID, NoteWnd] = {}     # Maps NOTE_IDs to NoteWnds
     self.topicManager = topicManager
     self.preferences = preferences
@@ -54,6 +58,10 @@ class NoteManager:
   def hideAllNotes(self):
     for note in self.noteWndDict.values():
       note.hideNote()
+
+  def saveAllNotes(self):
+    for note in self.noteWndDict.values():
+      self.saveNote.emit(note.noteData)
 
   def createNote(self, noteId: NOTE_ID) -> NoteWnd:
     # First, check that noteId is not already being used
