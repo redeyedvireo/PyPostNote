@@ -1,5 +1,6 @@
 import datetime
 from PySide6 import QtCore, QtWidgets, QtGui
+from note_style import NoteStyle, ENoteBackground
 
 # Type aliases
 NOTE_ID = int
@@ -21,6 +22,23 @@ class NoteData:
     self.alwaysOnTop = False
     self.textColor = QtGui.QColor('black')
     self.bgColor = QtGui.QColor('yellow')
-    self.bgType = 0
+    self.bgType = ENoteBackground(0)
     self.transparency = 100
 
+  @property
+  def noteStyle(self) -> NoteStyle:
+    style = NoteStyle()
+    style.backgroundColor = self.bgColor
+    style.textColor = self.textColor
+    style.backgroundType = self.bgType
+    style.transparency = self.transparency
+
+    return style
+
+  @noteStyle.setter
+  def noteStyle(self, noteStyle: NoteStyle):
+    # TODO: Are deep copy operations needed when copying QColors?
+    self.bgColor = noteStyle.backgroundColor
+    self.textColor = noteStyle.textColor
+    self.bgType = noteStyle.backgroundType
+    self.transparency = noteStyle.transparency

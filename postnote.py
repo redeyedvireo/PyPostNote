@@ -60,7 +60,8 @@ class PostNoteWindow(QtWidgets.QMainWindow):
       if loadingNotesSuccessful:
         # Create the note windows
         for note in notes:
-          self.noteManager.createPopulatedNote(note)
+          noteWnd = self.noteManager.createPopulatedNote(note)
+          # TODO: Connect to any signals the note might have, such as a signal to launch the topics editor.
       else:
         logging.error('Error loading notes')
         # TODO: Pop up an error dialog

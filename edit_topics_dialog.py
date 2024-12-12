@@ -5,13 +5,24 @@ from topic import Topic, kDefaultTopicId, kInvalidTopicId
 from note_manager import NoteManager
 from topic_manager import TopicManager
 from edit_topic_attr_dlg import EditTopicAttrDlg
+from util import createTopicIcon
 
 kIconWidth = 40
 kIconHeight	=	20
 
 class EditTopicsDialog(QtWidgets.QDialog):
 
-  def __init__(self, parent: QtWidgets.QWidget, topicManager: TopicManager, noteManager: NoteManager):
+  def __init__(self, parent: QtWidgets.QWidget, topicManager: TopicManager, noteManager: NoteManager = None):
+    """Constructor for the Edit Topics Dialog.  If noteManager is None (or not given in the parameters), this
+       dialog becomes a "topic picker", where the user cannot edit the topics.  This was necessary to avoid
+       circular references in certain places.
+
+    Args:
+        parent (QtWidgets.QWidget): Parent widget
+        topicManager (TopicManager): Topic Manager
+        noteManager (NoteManager, optional): Note Manager. Defaults to None.  If not provided, this dialog
+                  becomes a "topic picker", where the user cannot edit the topics.
+    """
     super().__init__(parent)
 
     self.ui = Ui_EditTopicsDialog()
@@ -22,6 +33,13 @@ class EditTopicsDialog(QtWidgets.QDialog):
 
     self.ui.topicListWidget.setIconSize(QtCore.QSize(kIconWidth, kIconHeight))
     self.populateTopicList()
+
+    # If noteManager is None, this is a "topic picker", so hide the Add, Edit, Delete buttons.
+    isTopicPicker = noteManager is None
+
+    self.ui.addButton.setVisible(isTopicPicker)
+    self.ui.editButton.setVisible(isTopicPicker)
+    self.ui.deleteButton.setVisible(isTopicPicker)
 
   def populateTopicList(self):
     topicIds = self.topicManager.getTopicIds()
@@ -46,18 +64,7 @@ class EditTopicsDialog(QtWidgets.QDialog):
     listWidgetItem.setText(topic.topicName)
 
     # Add an icon indicating the topic's colors
-    tempPixmap = QtGui.QPixmap(kIconWidth, kIconHeight)
-
-    tempPixmap.fill(topic.topicStyle.backgroundColor)
-
-    painter = QtGui.QPainter(tempPixmap)
-    painter.setPen(topic.topicStyle.textColor)
-    painter.drawText(QtCore.QRect(0, 0, kIconWidth, kIconHeight), \
-                     QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignVCenter, \
-                      'Text')
-    painter.end()
-
-    tempIcon = QtGui.QIcon(tempPixmap)
+    tempIcon = createTopicIcon(kIconWidth, kIconHeight, topic.topicStyle.backgroundColor, topic.topicStyle.textColor, 'Text')
 
     listWidgetItem.setIcon(tempIcon)
 
