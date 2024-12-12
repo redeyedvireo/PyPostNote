@@ -77,6 +77,9 @@ class NoteManager:
     """
     newNote = self.createNote(noteData.noteId)
 
-    newNote.setNoteContents(noteData)
+    newNote.noteData = noteData
+    newNote.dirty = False
 
     newNote.showNote()
+
+    return newNote

@@ -2,6 +2,7 @@ import sys
 import os.path
 from pathlib import Path
 import platform
+import datetime
 from PySide6 import QtCore, QtWidgets, QtGui
 
 def getScriptPath():
@@ -75,3 +76,21 @@ def copyQSize(src: QtCore.QSize) -> QtCore.QSize:
       QtCore.QSize: A deep copy of the QSize object.
   """
   return QtCore.QSize(src.width(), src.height())
+
+def createTopicIcon(width: int, height: int, bgColor: QtGui.QColor, textColor: QtGui.QColor, text: str):
+  tempPixmap = QtGui.QPixmap(width, height)
+
+  tempPixmap.fill(bgColor)
+
+  painter = QtGui.QPainter(tempPixmap)
+  painter.setPen(textColor)
+  painter.drawText(QtCore.QRect(0, 0, width, height), \
+                    QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignVCenter, \
+                    text)
+  painter.end()
+
+  return QtGui.QIcon(tempPixmap)
+
+# Format date
+def formatDateAndTime(inDate: datetime.date) -> str:
+  return inDate.strftime("%a %b %d %Y   %I:%M %p")

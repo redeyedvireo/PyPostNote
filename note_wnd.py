@@ -3,8 +3,9 @@ from button_bar_widget import ButtonBarWidget
 from text_edit import TextEdit
 from ui_note_wnd import Ui_NoteWnd
 from note_data import TOPIC_ID, NoteData, kInvalidNote, kInvalidTopic
-from note_style import NoteStyle
+from note_style import ENoteBackground, NoteStyle
 from topic_manager import TopicManager
+from note_properties_dlg import NotePropertiesDlg
 import datetime
 import logging
 
@@ -54,8 +55,29 @@ class NoteWnd(QtWidgets.QWidget):
     outNoteData.alwaysOnTop = self.alwaysOnTop
     outNoteData.textColor = self.noteStyle.textColor
     outNoteData.bgColor = self.noteStyle.backgroundColor
-    outNoteData.bgType = int(self.noteStyle.backgroundType)
+    outNoteData.bgType = self.noteStyle.backgroundType
     outNoteData.transparency = self.noteStyle.transparency
+
+    return outNoteData
+
+  @noteData.setter
+  def noteData(self, data: NoteData):
+    self.setWindowTitle(data.title)
+    self.setNoteGeometry(data.geometryData)
+    self.ui.textEdit.setHtml(data.contentsData)
+    self.noteId = data.noteId
+    self.noteCreationTime = data.addedTime
+    self.lastUpdateTime = data.lastModifiedTime
+    self._topicId = data.topicId    # Don't use the setter here, to avoid the update triggered by doing so
+    self.noteUsesOwnColorScheme = data.usesOwnColors
+    self.alwaysOnTop = data.alwaysOnTop
+
+    self.noteStyle.textColor = data.textColor
+    self.noteStyle.backgroundColor = data.bgColor
+    self.noteStyle.backgroundType = ENoteBackground(data.bgType)
+    self.noteStyle.transparency = data.transparency
+
+    self.updateNote()
 
   @property
   def dirty(self) -> bool:
@@ -137,27 +159,6 @@ class NoteWnd(QtWidgets.QWidget):
     self.setNoteTransparency(transparency)
     self.setAlwaysOnTopness(self.alwaysOnTop)
 
-  def setNoteContents(self, noteData: NoteData):
-    self.setWindowTitle(noteData.title)
-    self.setNoteGeometry(noteData.geometryData)
-    self.ui.textEdit.setHtml(noteData.contentsData)
-    self.noteId = noteData.noteId
-    self.noteCreationTime = noteData.addedTime
-    self.lastUpdateTime = noteData.lastModifiedTime
-    self._topicId = noteData.topicId    # Don't use the setter here, to avoid the update triggered by doing so
-    self.noteUsesOwnColorScheme = noteData.usesOwnColors
-    self.alwaysOnTop = noteData.alwaysOnTop
-
-    self.noteStyle.textColor = noteData.textColor
-    self.noteStyle.backgroundColor = noteData.bgColor
-    self.noteStyle.backgroundType = noteData.bgType
-    self.noteStyle.transparency = noteData.transparency
-
-    self.updateNote()
-
-    self.ui.textEdit.document().setModified(False)
-
-
   def setNoteTitle(self, title: str):
     self.setWindowTitle(title)
 
@@ -183,6 +184,7 @@ class NoteWnd(QtWidgets.QWidget):
     self.buttonBarWidget.setTopicMenu(self.topicMenu)
 
     # TODO: Connect signals (see C++ version)
+    self.buttonBarWidget.notePropertiesDlgSignal.connect(self.onPropertiesDlg)
 
   # TODO: Instead of doing it this way, try to install an event filter on the window.  To do so,
   #       Google: "pyside6 detect click on title bar"
@@ -260,6 +262,15 @@ class NoteWnd(QtWidgets.QWidget):
       # TODO: Update the note in the database
       # self.db.updateNote(self)
       self.updateNote()
+
+  def onPropertiesDlg(self):
+    dlg = NotePropertiesDlg(self.topicManager, self.noteData, self)
+
+    result = dlg.exec_()
+
+    if result == QtWidgets.QDialog.DialogCode.Accepted:
+      # Set note with the data from the dialog
+      self.noteData = dlg.noteData
 
   @QtCore.Slot()
   def on_textEdit_textChanged(self):
