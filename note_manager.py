@@ -1,7 +1,8 @@
 from PySide6 import QtCore, QtWidgets, QtGui
-from note_data import NoteData, NOTE_ID
+from note_data import TOPIC_ID, NoteData, NOTE_ID
 from note_wnd import NoteWnd
 from preferences import Preferences
+from topic import Topic, kDefaultTopicId
 from topic_manager import TopicManager
 import logging
 
@@ -62,6 +63,29 @@ class NoteManager(QtCore.QObject):
   def saveAllNotes(self):
     for note in self.noteWndDict.values():
       self.saveNote.emit(note.noteData)
+
+  def onTopicChanged(self, topic: Topic):
+    """Refreshes all notes with the given topic.  This must be called whenever a
+       topic has changed.
+
+    Args:
+        topic (Topic): Topic that was changed
+    """
+    for noteWnd in self.noteWndDict.values():
+      if noteWnd.topicId == topic.id:
+        # This note uses the topic, so refresh it.
+        noteWnd.updateNote()
+
+  def onTopicDeleted(self, topicId: TOPIC_ID):
+    """Scans through the notes, and changes any note that was using the given topic
+       to instead use the default topic.
+
+    Args:
+        topicId (TOPIC_ID): Topic ID
+    """
+    for noteWnd in self.noteWndDict.values():
+      if noteWnd.topicId == topicId:
+        noteWnd.topicId = kDefaultTopicId
 
   def createNote(self, noteId: NOTE_ID) -> NoteWnd:
     # First, check that noteId is not already being used

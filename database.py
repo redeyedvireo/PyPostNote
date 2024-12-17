@@ -3,7 +3,7 @@ from PySide6 import QtCore, QtSql, QtGui
 from pathlib import Path
 from note_data import NoteData, NOTE_ID, TOPIC_ID
 from note_style import ENoteBackground
-from topic import TopicData
+from topic import TopicData, Topic
 import datetime
 import logging
 
@@ -71,7 +71,7 @@ class Database:
 
     return queryObj.value(fieldIndex)
 
-  def saveNote(self, noteData: NoteData) -> bool:
+  def updateNote(self, noteData: NoteData) -> bool:
     """Saves a note to the database.
 
     Args:
@@ -186,3 +186,81 @@ class Database:
 
     return (True, topics)
 
+  def addTopic(self, topic: Topic) -> bool:
+    """Adds a topic to the database.
+      Returns:
+        True if successful, False if not.
+    """
+    queryObj = QtSql.QSqlQuery()
+    queryObj.prepare("""insert into topics (id, name, textcolor, bgcolor, bgtype, transparency)
+                              values (?, ?, ?, ?, ?, ?)""")
+
+    queryObj.addBindValue(topic.id)
+    queryObj.addBindValue(topic.topicName)
+    queryObj.addBindValue(topic.textColor.rgba())
+    queryObj.addBindValue(topic.backgroundColor.rgba())
+    queryObj.addBindValue(topic.backgroundType.value)
+    queryObj.addBindValue(topic.transparency)
+
+    queryObj.exec_()
+
+    # Check for errors
+    sqlErr = queryObj.lastError()
+    if sqlErr.type() != QtSql.QSqlError.ErrorType.NoError:
+      self.reportError(f'[addTopic]: {sqlErr.text()}')
+      return False
+    else:
+      return True
+
+  def updateTopic(self, topic: Topic) -> bool:
+    """Updates a topic
+
+    Args:
+        topic (Topic): Topic to update
+
+    Returns:
+        bool: True if successful, False if not
+    """
+    queryObj = QtSql.QSqlQuery()
+    queryObj.prepare("update topics set name=?, textcolor=?, bgcolor=?, bgtype=?, transparency=? where id=?")
+
+    queryObj.addBindValue(topic.topicName)
+    queryObj.addBindValue(topic.textColor.rgba())
+    queryObj.addBindValue(topic.backgroundColor.rgba())
+    queryObj.addBindValue(topic.backgroundType.value)
+    queryObj.addBindValue(topic.transparency)
+    queryObj.addBindValue(topic.id)
+
+    queryObj.exec_()
+
+    # Check for errors
+    sqlErr = queryObj.lastError()
+    if sqlErr.type() != QtSql.QSqlError.ErrorType.NoError:
+      self.reportError(f'[updateTopic]: {sqlErr.text()}')
+      return False
+    else:
+      return True
+
+  def deleteTopic(self, topicId: TOPIC_ID) -> bool:
+    """Deletes a topic.
+
+    Args:
+        topic (Topic): Topic to delete
+
+    Returns:
+        bool: True if successful, False otherwise.
+    """
+    queryObj = QtSql.QSqlQuery()
+    queryObj.prepare("delete from topics where id=?")
+
+    queryObj.addBindValue(topicId)
+
+    queryObj.exec_()
+
+    # Check for errors
+    sqlErr = queryObj.lastError()
+    if sqlErr.type() != QtSql.QSqlError.ErrorType.NoError:
+      self.reportError(f'[deleteTopic]: {sqlErr.text()}')
+      return False
+    else:
+      return True

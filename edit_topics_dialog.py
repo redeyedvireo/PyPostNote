@@ -37,9 +37,9 @@ class EditTopicsDialog(QtWidgets.QDialog):
     # If noteManager is None, this is a "topic picker", so hide the Add, Edit, Delete buttons.
     isTopicPicker = noteManager is None
 
-    self.ui.addButton.setVisible(isTopicPicker)
-    self.ui.editButton.setVisible(isTopicPicker)
-    self.ui.deleteButton.setVisible(isTopicPicker)
+    self.ui.addButton.setVisible(not isTopicPicker)
+    self.ui.editButton.setVisible(not isTopicPicker)
+    self.ui.deleteButton.setVisible(not isTopicPicker)
 
   def populateTopicList(self):
     topicIds = self.topicManager.getTopicIds()
@@ -122,10 +122,3 @@ class EditTopicsDialog(QtWidgets.QDialog):
 
     self.topicManager.deleteTopic(topicId, True)
 
-    # TODO: Scan through all notes and for any note that uses this topic, set that note's topic to Default
-    allNoteIds = self.noteManager.allNoteIds()
-
-    for noteId in allNoteIds:
-      noteWnd = self.noteManager.getNote(noteId)
-      if noteWnd.topicId == topicId:
-        noteWnd.topicId = kDefaultTopicId
