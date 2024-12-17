@@ -131,19 +131,17 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot(Topic)
   def onNewTopicAdded(self, topic: Topic):
-    # TODO: Implement
-    print(f'onNewTopicAdded: {topic.topicName}')
+    self.db.addTopic(topic)
 
   @QtCore.Slot(Topic)
   def onTopicUpdated(self, topic: Topic):
-    # TODO: Implement
-    print(f'onTopicUpdated: {topic.topicName}')
+    self.db.updateTopic(topic)
+    self.noteManager.onTopicChanged(topic)
 
   @QtCore.Slot(int)
   def onTopicDeleted(self, topicId: TOPIC_ID):
-    # TODO: Implement
-    print(f'onTopicDeleted: {topicId}')
-
+    self.db.deleteTopic(topicId)
+    self.noteManager.onTopicDeleted(topicId)
 
   def onActivated(self, reason: QtWidgets.QSystemTrayIcon.ActivationReason):
     if reason == QtWidgets.QSystemTrayIcon.ActivationReason.Context:
@@ -175,7 +173,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot(NoteData)
   def onSaveNote(self, noteData: NoteData):
-    success = self.db.saveNote(noteData)
+    success = self.db.updateNote(noteData)
     if not success:
       logging.error(f'Error saving note {noteData.title} (ID: {noteData.noteId})')
       # TODO: Show error dialog?
