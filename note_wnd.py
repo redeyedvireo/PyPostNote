@@ -238,7 +238,7 @@ class NoteWnd(QtWidgets.QWidget):
   def populateTopicMenu(self):
     self.topicMenu.clear()
 
-    topicIdList = self.topicManager.getTopicIds()
+    topicIdList = self.topicManager.getTopicIds(True)
 
     for topicId in topicIdList:
       topic = self.topicManager.getTopic(topicId)

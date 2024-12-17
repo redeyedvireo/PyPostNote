@@ -42,7 +42,7 @@ class EditTopicsDialog(QtWidgets.QDialog):
     self.ui.deleteButton.setVisible(not isTopicPicker)
 
   def populateTopicList(self):
-    topicIds = self.topicManager.getTopicIds()
+    topicIds = self.topicManager.getTopicIds(True)
 
     for topicId in topicIds:
       topic = self.topicManager.getTopic(topicId)
