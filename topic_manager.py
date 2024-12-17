@@ -36,8 +36,27 @@ class TopicManager(QtCore.QObject):
   def getTopic(self, topicId: TOPIC_ID) -> Topic | None:
     return self.topicMap[topicId] if topicId in self.topicMap else None
 
-  def getTopicIds(self) -> list[TOPIC_ID]:
-    return self.topicMap.keys()
+  def getTopicIds(self, alphabeticByTopicName: bool = False) -> list[TOPIC_ID]:
+    """Returns a list of all topic IDs.
+
+    Args:
+        alphabeticByTopicName (bool): If true, the IDs will be returned such that the resulting
+                                      topics will be in alphabetical order, by topic name
+
+    Returns:
+        list[TOPIC_ID]: List of topic IDs
+    """
+    topicIds = self.topicMap.keys()
+
+    if not alphabeticByTopicName:
+      return topicIds
+    else:
+      # Create a dictionary: [topicID, topicName]
+      topicNameDict = {}
+      for topicId in self.topicMap.keys():
+        topicNameDict[topicId] = self.topicMap[topicId].topicName
+      sortedTopicNameDict = dict(sorted(topicNameDict.items(), key=lambda x: x[1]))
+      return sortedTopicNameDict.keys()
 
   def addTopicFromTopicData(self, topicData: TopicData):
     """Adds a topic to the list, from topic data.  This is generally used when reading topics from the database.
