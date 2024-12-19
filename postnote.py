@@ -73,6 +73,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   def connectNoteSignals(self, noteWnd: NoteWnd):
     noteWnd.saveNote.connect(self.onSaveNote)
+    noteWnd.deleteNote.connect(self.onDeleteNote)
 
   def updateAutoShutdown(self):
     # TODO: Implement
@@ -141,6 +142,11 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
 
   # ************ SLOTS ************
+
+  @QtCore.Slot(int)
+  def onDeleteNote(self, noteId: int):
+    self.noteManager.deleteNote(noteId)
+    self.db.deleteNote(noteId)
 
   @QtCore.Slot(Topic)
   def onNewTopicAdded(self, topic: Topic):

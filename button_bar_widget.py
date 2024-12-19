@@ -8,6 +8,7 @@ kAnimateInterval = 200
 
 class ButtonBarWidget(QtWidgets.QWidget):
   notePropertiesDlgSignal = QtCore.Signal()
+  noteDeleteSignal = QtCore.Signal()
 
   def __init__(self, textEditRect: QtCore.QRect, parent: QtWidgets.QWidget):
     super(ButtonBarWidget, self).__init__(parent)
@@ -162,10 +163,11 @@ class ButtonBarWidget(QtWidgets.QWidget):
 
   @QtCore.Slot()
   def on_deleteButton_clicked(self):
-    print('Delete button clicked')
+    self.noteDeleteSignal.emit()
 
   @QtCore.Slot()
   def on_hideButton_clicked(self):
+    # TODO: Implement
     print('Hide button clicked')
 
   @QtCore.Slot()
@@ -174,4 +176,5 @@ class ButtonBarWidget(QtWidgets.QWidget):
 
   @QtCore.Slot()
   def on_topicButton_clicked(self):
+    # TODO: Implement
     print('Topic button clicked')

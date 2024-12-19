@@ -150,6 +150,31 @@ class Database:
     else:
       return True
 
+  def deleteNote(self, noteId: NOTE_ID) -> bool:
+    """Deletes a note from the database.
+
+    Args:
+        noteId (NOTE_ID): ID of the note to delete
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    queryObj = QtSql.QSqlQuery()
+    queryObj.prepare("delete from notes where noteid=?")
+
+    queryObj.addBindValue(noteId)
+
+    queryObj.exec_()
+
+    # Check for errors
+    sqlErr = queryObj.lastError()
+
+    if sqlErr.type() != QtSql.QSqlError.ErrorType.NoError:
+      self.reportError(f'deleteNote error: {sqlErr.text()}')
+      return False
+    else:
+      return True
+
   def getNotes(self) -> tuple[bool, list[NoteData]]:
     """ Retrieves notes from the database.
         Returns a tuple consisting of a boolean, indicating success or failure,  and a list of NoteData.
