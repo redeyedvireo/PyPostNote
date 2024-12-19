@@ -13,6 +13,7 @@ import logging
 class NoteWnd(QtWidgets.QWidget):
   saveNote = QtCore.Signal(NoteData)
   deleteNote = QtCore.Signal(int)
+  showEditTopicDialog = QtCore.Signal(int)
 
   def __init__(self, topicManager: TopicManager, parent: QtWidgets.QWidget = None):
     super(NoteWnd, self).__init__(parent, QtCore.Qt.Tool | QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint)
@@ -37,6 +38,8 @@ class NoteWnd(QtWidgets.QWidget):
     self.dirtyFlag = False          # Indicates if the user has made any changes to the note
 
     self.noteStyle = NoteStyle()
+
+    self.propertiesDlg = None
 
     self.setMinimumSize(QtCore.QSize(40, 20))
     self.updateNote()
@@ -270,14 +273,24 @@ class NoteWnd(QtWidgets.QWidget):
       self.dirty = False
 
   def onPropertiesDlg(self):
-    dlg = NotePropertiesDlg(self.topicManager, self.noteData, self)
+    self.propertiesDlg = NotePropertiesDlg(self.topicManager, self.noteData, self)
+    self.propertiesDlg.showEditTopicsDialogSignal.connect(self.onEditNoteTopicsTriggered)
 
-    result = dlg.exec_()
+    result = self.propertiesDlg.exec_()
 
     if result == QtWidgets.QDialog.DialogCode.Accepted:
       # Set note with the data from the dialog
-      self.noteData = dlg.noteData
+      self.noteData = self.propertiesDlg.noteData
       self.saveNote.emit(self.noteData)
+
+    self.propertiesDlg = None
+
+  def onEditNoteTopicsTriggered(self):
+    self.showEditTopicDialog.emit(self.noteId)
+
+  def updateTopics(self):
+    if self.propertiesDlg is not None:
+      self.propertiesDlg.populateTopicCombo()
 
   def onDeleteNote(self):
     self.deleteNote.emit(self.noteId)

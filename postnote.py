@@ -75,6 +75,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
   def connectNoteSignals(self, noteWnd: NoteWnd):
     noteWnd.saveNote.connect(self.onSaveNote)
     noteWnd.deleteNote.connect(self.onDeleteNote)
+    noteWnd.showEditTopicDialog.connect(self.onEditTopicsTriggeredFromNote)
 
   def updateAutoShutdown(self):
     # TODO: Implement
@@ -225,6 +226,17 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     if not success:
       logging.error(f'Error saving note {noteData.title} (ID: {noteData.noteId})')
       # TODO: Show error dialog?
+
+  def onEditTopicsTriggeredFromNote(self, noteId: int):
+    """Triggers the edit topics dialog from a note.  After the dialog is closed,
+       the note will be updated with the new topic.
+
+    Args:
+        noteId (int): Note ID
+    """
+    self.on_actionEdit_Topics_triggered()
+
+    self.noteManager.updateTopicsForANote(noteId)
 
   @QtCore.Slot()
   def on_actionSmall_triggered(self):

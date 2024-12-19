@@ -60,6 +60,8 @@ class EditTopicsDialog(QtWidgets.QDialog):
 
     self.ui.topicListWidget.addItem(newItem)
 
+    self.ui.topicListWidget.sortItems(QtCore.Qt.SortOrder.AscendingOrder)
+
   def setTopicContents(self, topic: Topic, listWidgetItem: QtWidgets.QListWidgetItem):
     listWidgetItem.setText(topic.topicName)
 

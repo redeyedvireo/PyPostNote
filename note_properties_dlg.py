@@ -10,6 +10,8 @@ kIconWidth = 40
 kIconHeight = 20
 
 class NotePropertiesDlg(QtWidgets.QDialog):
+  showEditTopicsDialogSignal = QtCore.Signal()
+
   def __init__(self, topicManager: TopicManager, noteData: NoteData, parent: QtWidgets.QWidget):
     super().__init__(parent)
 
@@ -52,8 +54,8 @@ class NotePropertiesDlg(QtWidgets.QDialog):
 
   @QtCore.Slot()
   def on_editTopicsButton_clicked(self):
-    # TODO: implement
-    print('on_editTopicsButton_clicked')
+    self.showEditTopicsDialogSignal.emit()
+
     # We might not be able to edit topics here, because we can't get to the note manager, because
     # this dialog is launched from NoteWnd, which does not have access to the note manager (in order
     # to avoid a circular reference.)
