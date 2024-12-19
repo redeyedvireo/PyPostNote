@@ -8,6 +8,8 @@ kIconWidth = 40
 kIconHeight	=	20
 
 class QuickCreateDlg(QtWidgets.QDialog):
+  showEditTopicsDialogSignal = QtCore.Signal()
+
   def __init__(self, topicManager: TopicManager, parent: QtWidgets.QWidget):
     super().__init__(parent)
 
@@ -45,6 +47,10 @@ class QuickCreateDlg(QtWidgets.QDialog):
   def getNoteSize(self):
     sizeIndex = self.ui.sizeCombo.currentIndex()
     return ENoteSizeEnum(sizeIndex)
+
+  @QtCore.Slot()
+  def on_topicsButton_clicked(self):
+    self.showEditTopicsDialogSignal.emit()
 
   @QtCore.Slot()
   def on_buttonBox_accepted(self):

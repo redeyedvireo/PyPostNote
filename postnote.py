@@ -196,21 +196,31 @@ class PostNoteWindow(QtWidgets.QMainWindow):
           self.createNewNote(ENoteSizeEnum.eExLargeNote)
 
         case EDoubleClickAction.eDCAQuickCreateDialog:
-          dlg = QuickCreateDlg(self.topicManager, self)
-          result = dlg.exec_()
-          if result == QtWidgets.QDialog.DialogCode.Accepted:
-            noteTitle = dlg.getNoteTitle()
-            noteSize = dlg.getNoteSize()
-            noteTopicId = dlg.getTopicId()
-
-            noteWnd = self.createNewNote(noteSize)
-
-            if noteWnd is not None:
-              noteWnd.noteTitle = noteTitle
-              noteWnd.topicId = noteTopicId
+          self.showQuickCreateDialog()
 
         case EDoubleClickAction.eDCAShowAllNotes:
           self.noteManager.showAllNotes()
+
+  def showQuickCreateDialog(self):
+    dlg = QuickCreateDlg(self.topicManager, self)
+
+    def updateTopics():
+      self.on_actionEdit_Topics_triggered()
+      dlg.populateTopicCombo()
+
+    dlg.showEditTopicsDialogSignal.connect(updateTopics)
+
+    result = dlg.exec_()
+    if result == QtWidgets.QDialog.DialogCode.Accepted:
+      noteTitle = dlg.getNoteTitle()
+      noteSize = dlg.getNoteSize()
+      noteTopicId = dlg.getTopicId()
+
+      noteWnd = self.createNewNote(noteSize)
+
+      if noteWnd is not None:
+        noteWnd.noteTitle = noteTitle
+        noteWnd.topicId = noteTopicId
 
   @QtCore.Slot()
   def onShowNote(self):
