@@ -4,8 +4,9 @@ from note_data import TOPIC_ID, NoteData, ENoteSizeEnum
 from note_manager import NoteManager
 from note_style import ENoteBackground
 from note_wnd import NoteWnd
-from preferences import Preferences
+from preferences import Preferences, EDoubleClickAction
 from preferences_dlg import PreferencesDlg
+from quick_create_dlg import QuickCreateDlg
 from topic import Topic
 from topic_manager import TopicManager
 from ui_postnote import Ui_PostNoteClass
@@ -136,9 +137,10 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     if success:
       # Connect to any signals the note might have, such as a signal to launch the topics editor.
       self.connectNoteSignals(noteWnd)
+      return noteWnd
     else:
       logging.error(f'[PostNoteWindow.createNewNote] Error creating a note of size {sizeEnum}')
-      return
+      return None
 
 
   # ************ SLOTS ************
@@ -173,14 +175,41 @@ class PostNoteWindow(QtWidgets.QMainWindow):
         note = self.noteManager.getNote(id)
 
         if note is not None:
-          title = note.noteTitle()
+          title = note.noteTitle
           action = self.noteListMenu.addAction(title, self.onShowNote)
           action.setData(id)
 
     elif reason == QtWidgets.QSystemTrayIcon.ActivationReason.DoubleClick:
-      # The tray icon was dobule-clicked - create a new note
-      # TODO: Implement
-      print('Implement tray double-click event')
+      # The tray icon was double-clicked
+      match self.preferences.doubleClickAction:
+        case EDoubleClickAction.eDCACreateSmallNote:
+          self.createNewNote(ENoteSizeEnum.eSmallNote)
+
+        case EDoubleClickAction.eDCACreateMediumNote:
+          self.createNewNote(ENoteSizeEnum.eMediumNote)
+
+        case EDoubleClickAction.eDCACreateLargeNote:
+          self.createNewNote(ENoteSizeEnum.eLargeNote)
+
+        case EDoubleClickAction.eDCACreateExtraLargeNote:
+          self.createNewNote(ENoteSizeEnum.eExLargeNote)
+
+        case EDoubleClickAction.eDCAQuickCreateDialog:
+          dlg = QuickCreateDlg(self.topicManager, self)
+          result = dlg.exec_()
+          if result == QtWidgets.QDialog.DialogCode.Accepted:
+            noteTitle = dlg.getNoteTitle()
+            noteSize = dlg.getNoteSize()
+            noteTopicId = dlg.getTopicId()
+
+            noteWnd = self.createNewNote(noteSize)
+
+            if noteWnd is not None:
+              noteWnd.noteTitle = noteTitle
+              noteWnd.topicId = noteTopicId
+
+        case EDoubleClickAction.eDCAShowAllNotes:
+          self.noteManager.showAllNotes()
 
   @QtCore.Slot()
   def onShowNote(self):
