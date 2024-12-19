@@ -1,13 +1,19 @@
 import datetime
+from enum import Enum
 from PySide6 import QtCore, QtWidgets, QtGui
 from note_style import NoteStyle, ENoteBackground
+
+class ENoteSizeEnum(Enum):
+  eSmallNote = 0
+  eMediumNote = 1
+  eLargeNote = 2
+  eExLargeNote = 3
 
 # Type aliases
 NOTE_ID = int
 TOPIC_ID = int
 
 kInvalidNote = -1
-kInvalidTopic = -1
 
 class NoteData:
   def __init__(self):

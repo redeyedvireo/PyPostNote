@@ -2,8 +2,9 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from button_bar_widget import ButtonBarWidget
 from text_edit import TextEdit
 from ui_note_wnd import Ui_NoteWnd
-from note_data import TOPIC_ID, NoteData, kInvalidNote, kInvalidTopic
+from note_data import TOPIC_ID, NoteData, kInvalidNote
 from note_style import ENoteBackground, NoteStyle
+from topic import kDefaultTopicId
 from topic_manager import TopicManager
 from note_properties_dlg import NotePropertiesDlg
 import datetime
@@ -29,7 +30,7 @@ class NoteWnd(QtWidgets.QWidget):
     self.noteId = kInvalidNote
     self.noteCreationTime = datetime.datetime.now()
     self.lastUpdateTime = datetime.datetime.now()
-    self._topicId = kInvalidTopic
+    self._topicId = kDefaultTopicId
     self.noteUsesOwnColorScheme = False
     self.alwaysOnTop = False
     self.dirtyFlag = False          # Indicates if the user has made any changes to the note

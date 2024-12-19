@@ -1,10 +1,19 @@
 from PySide6 import QtCore, QtWidgets, QtGui
-from note_data import TOPIC_ID, NoteData, NOTE_ID
+from note_data import TOPIC_ID, NoteData, NOTE_ID, ENoteSizeEnum
 from note_wnd import NoteWnd
 from preferences import Preferences
 from topic import Topic, kDefaultTopicId
 from topic_manager import TopicManager
 import logging
+
+"""List of note sizes (tuples of width, height)
+"""
+NoteSizeList= [
+  (125, 75),
+  (200, 203),
+  (350, 250),
+  (305, 413)
+]
 
 class NoteManager(QtCore.QObject):
   saveNote = QtCore.Signal(NoteData)
@@ -100,8 +109,6 @@ class NoteManager(QtCore.QObject):
     # Add to noteWndDict
     self.noteWndDict[noteId] = noteWnd
 
-    # TODO: Figure out how to set transparency (should this be done in NoteWnd?)
-
     return noteWnd
 
   def createPopulatedNote(self, noteData: NoteData):
@@ -115,3 +122,24 @@ class NoteManager(QtCore.QObject):
     newNote.showNote()
 
     return newNote
+
+  def createBlankNote(self, noteSize: ENoteSizeEnum) -> NoteWnd:
+    noteId = self.getFreeId()
+
+    newNote = self.createNote(noteId)
+
+    noteSizeTuple = NoteSizeList[noteSize.value]
+
+    newNote.resize(QtCore.QSize(noteSizeTuple[0], noteSizeTuple[1]))
+    newNote.showNote()
+
+    return newNote
+
+  def getFreeId(self, addToDatabase = False):
+    """Returns the next free ID to use when creating a new note.
+    """
+    keysInUse = self.noteWndDict.keys()
+
+    highestKey = max(keysInUse) if len(keysInUse) > 0 else 0
+
+    return highestKey + 1

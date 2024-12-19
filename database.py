@@ -71,6 +71,46 @@ class Database:
 
     return queryObj.value(fieldIndex)
 
+  def addNote(self, noteData: NoteData) -> bool:
+    """Adds a new note to the database.
+
+    Args:
+        noteData (NoteData): NoteData describing the note
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    queryObj = QtSql.QSqlQuery()
+    queryObj.prepare("""insert into notes (noteid, title, notetext, geometry, added,
+                     lastupdated, topicid, usesowncolors, alwaysontop,
+                     textcolor, bgcolor, bgtype, transparency)
+                     values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""")
+
+    queryObj.addBindValue(noteData.noteId)
+    queryObj.addBindValue(noteData.title)
+    queryObj.addBindValue(noteData.contentsData)
+    queryObj.addBindValue(noteData.geometryData)
+    queryObj.addBindValue(noteData.addedTime.timestamp())
+    queryObj.addBindValue(noteData.lastModifiedTime.timestamp())
+    queryObj.addBindValue(noteData.topicId)
+    queryObj.addBindValue(noteData.usesOwnColors)
+    queryObj.addBindValue(noteData.alwaysOnTop)
+    queryObj.addBindValue(noteData.textColor.rgba())
+    queryObj.addBindValue(noteData.bgColor.rgba())
+    queryObj.addBindValue(noteData.bgType.value)
+    queryObj.addBindValue(noteData.transparency)
+
+    queryObj.exec_()
+
+    # Check for errors
+    sqlErr = queryObj.lastError()
+
+    if sqlErr.type() != QtSql.QSqlError.ErrorType.NoError:
+      self.reportError(f'addNote error: {sqlErr.text()}')
+      return False
+    else:
+      return True
+
   def updateNote(self, noteData: NoteData) -> bool:
     """Saves a note to the database.
 
@@ -105,7 +145,7 @@ class Database:
     sqlErr = queryObj.lastError()
 
     if sqlErr.type() != QtSql.QSqlError.ErrorType.NoError:
-      self.reportError(f'saveNote error: {sqlErr.text()}')
+      self.reportError(f'updateNote error: {sqlErr.text()}')
       return False
     else:
       return True
