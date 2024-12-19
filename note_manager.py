@@ -135,6 +135,24 @@ class NoteManager(QtCore.QObject):
 
     return newNote
 
+  def deleteNote(self, noteId: NOTE_ID):
+    """Deletes the note with the given ID
+
+       To delete a note, several steps are performed:
+        1. Immediately hide the note
+        1. Remove the note from noteWndDict
+
+    Args:
+        noteId (NOTE_ID): ID of the note to delete
+    """
+    if noteId in self.noteWndDict:
+      noteWnd = self.noteWndDict[noteId]
+      noteWnd.hideNote()
+      noteWnd.deleteLater()
+      del self.noteWndDict[noteId]
+    else:
+      logging.error(f'[NoteManager.deleteNote] Note ID {noteId} not found in noteWndDict')
+
   def getFreeId(self, addToDatabase = False):
     """Returns the next free ID to use when creating a new note.
     """

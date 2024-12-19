@@ -12,6 +12,7 @@ import logging
 
 class NoteWnd(QtWidgets.QWidget):
   saveNote = QtCore.Signal(NoteData)
+  deleteNote = QtCore.Signal(int)
 
   def __init__(self, topicManager: TopicManager, parent: QtWidgets.QWidget = None):
     super(NoteWnd, self).__init__(parent, QtCore.Qt.Tool | QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint)
@@ -185,8 +186,9 @@ class NoteWnd(QtWidgets.QWidget):
     self.topicMenu.aboutToShow.connect(self.populateTopicMenu)
     self.buttonBarWidget.setTopicMenu(self.topicMenu)
 
-    # TODO: Connect signals (see C++ version)
+    # Connect signals
     self.buttonBarWidget.notePropertiesDlgSignal.connect(self.onPropertiesDlg)
+    self.buttonBarWidget.noteDeleteSignal.connect(self.onDeleteNote)
 
   # TODO: Instead of doing it this way, try to install an event filter on the window.  To do so,
   #       Google: "pyside6 detect click on title bar"
@@ -274,6 +276,9 @@ class NoteWnd(QtWidgets.QWidget):
       # Set note with the data from the dialog
       self.noteData = dlg.noteData
       self.saveNote.emit(self.noteData)
+
+  def onDeleteNote(self):
+    self.deleteNote.emit(self.noteId)
 
   @QtCore.Slot()
   def on_textEdit_textChanged(self):
