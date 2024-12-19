@@ -1,7 +1,8 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from database import Database
-from note_data import TOPIC_ID, NoteData
+from note_data import TOPIC_ID, NoteData, ENoteSizeEnum
 from note_manager import NoteManager
+from note_style import ENoteBackground
 from note_wnd import NoteWnd
 from preferences import Preferences
 from preferences_dlg import PreferencesDlg
@@ -127,6 +128,18 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.trayIcon.setContextMenu(self.trayIconMenu)
     self.trayIcon.show()
 
+  def createNewNote(self, sizeEnum: ENoteSizeEnum):
+    noteWnd = self.noteManager.createBlankNote(sizeEnum)
+    success = self.db.addNote(noteWnd.noteData)
+
+    if success:
+      # Connect to any signals the note might have, such as a signal to launch the topics editor.
+      self.connectNoteSignals(noteWnd)
+    else:
+      logging.error(f'[PostNoteWindow.createNewNote] Error creating a note of size {sizeEnum}')
+      return
+
+
   # ************ SLOTS ************
 
   @QtCore.Slot(Topic)
@@ -180,27 +193,19 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot()
   def on_actionSmall_triggered(self):
-    # TODO: Implement
-    # TODO: call connectNoteSignals
-    print('Create small note')
+    self.createNewNote(ENoteSizeEnum.eSmallNote)
 
   @QtCore.Slot()
   def on_actionMedium_triggered(self):
-    # TODO: Implement
-    # TODO: call connectNoteSignals
-    print('Create medium note')
+    self.createNewNote(ENoteSizeEnum.eMediumNote)
 
   @QtCore.Slot()
   def on_actionLarge_triggered(self):
-    # TODO: Implement
-    # TODO: call connectNoteSignals
-    print('Create large note')
+    self.createNewNote(ENoteSizeEnum.eLargeNote)
 
   @QtCore.Slot()
   def on_actionExtra_Large_triggered(self):
-    # TODO: Implement
-    # TODO: call connectNoteSignals
-    print('Create extra large note')
+    self.createNewNote(ENoteSizeEnum.eExLargeNote)
 
   @QtCore.Slot()
   def on_actionExport_Notes_triggered(self):
