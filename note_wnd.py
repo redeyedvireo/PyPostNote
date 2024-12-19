@@ -109,8 +109,13 @@ class NoteWnd(QtWidgets.QWidget):
     self.updateNote()
     self.dirty = True
 
+  @property
   def noteTitle(self):
     return self.windowTitle()
+
+  @noteTitle.setter
+  def noteTitle(self, title: str):
+    self.setWindowTitle(title)
 
   def showNote(self):
     self.show()
@@ -161,9 +166,6 @@ class NoteWnd(QtWidgets.QWidget):
     self.ui.textEdit.setStyleSheet(f'QTextEdit {{ color: {textColor.name()}; background-color: {bgColor.name()} }}')
     self.setNoteTransparency(transparency)
     self.setAlwaysOnTopness(self.alwaysOnTop)
-
-  def setNoteTitle(self, title: str):
-    self.setWindowTitle(title)
 
   def setNoteGeometry(self, geometry: QtCore.QByteArray):
     # TODO: I think this is what causes the issue where all windows appear in the center of the screen.  There needs to be
