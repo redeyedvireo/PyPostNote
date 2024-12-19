@@ -153,6 +153,17 @@ class NoteManager(QtCore.QObject):
     else:
       logging.error(f'[NoteManager.deleteNote] Note ID {noteId} not found in noteWndDict')
 
+  def updateTopicsForANote(self, noteId: NOTE_ID):
+    """Causes a note to update the topic list.  This is generally used when a note invokes
+        the Edit Topics dialog, and the topics have changed.
+
+    Args:
+        noteId (NOTE_ID): Note ID
+    """
+    if noteId in self.noteWndDict:
+      noteWnd = self.noteWndDict[noteId]
+      noteWnd.updateTopics()
+
   def getFreeId(self, addToDatabase = False):
     """Returns the next free ID to use when creating a new note.
     """
