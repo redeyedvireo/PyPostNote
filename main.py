@@ -30,6 +30,8 @@ def main():
 
   logging.info("PyPostNote starting up...")
 
+  QtWidgets.QApplication.setQuitOnLastWindowClosed(False)
+
   preferences = Preferences()
   database = Database()
   topicManager = TopicManager()
