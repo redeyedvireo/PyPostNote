@@ -72,6 +72,13 @@ class NoteManager(QtCore.QObject):
   def saveAllNotes(self):
     for note in self.noteWndDict.values():
       self.saveNote.emit(note.noteData)
+      note.dirty = False
+
+  def saveDirtyNotes(self):
+    for note in self.noteWndDict.values():
+      if note.dirty:
+        self.saveNote.emit(note.noteData)
+        note.dirty = False
 
   def onTopicChanged(self, topic: Topic):
     """Refreshes all notes with the given topic.  This must be called whenever a
