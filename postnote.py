@@ -38,12 +38,13 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.topicManager.topicUpdated.connect(self.onTopicUpdated)
     self.topicManager.topicDeleted.connect(self.onTopicDeleted)
 
+    self.autoSaveTimer = QtCore.QTimer()
+    self.autoSaveTimer.timeout.connect(self.onAutoSaveTimerTimeout)
+
     self.setIcon()
     self.createNoteMenu()
 
   def initialize(self):
-    # TODO: See stuff from C++ version
-
     preferencesPath = getPrefsPath(kAppName, kPrefsName)
 
     self.preferences.readPrefsFile(preferencesPath)
@@ -68,6 +69,9 @@ class PostNoteWindow(QtWidgets.QMainWindow):
           noteWnd = self.noteManager.createPopulatedNote(note)
           # Connect to any signals the note might have, such as a signal to launch the topics editor.
           self.connectNoteSignals(noteWnd)
+
+        # Start the auto-save timer
+        self.autoSaveTimer.start(1000 * 60 * self.preferences.autoSaveMinutes)
       else:
         logging.error('Error loading notes')
         # TODO: Pop up an error dialog
@@ -282,7 +286,8 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
     self.updateAutoShutdown()
 
-    # TODO: update other things, like the auto-save timer, and whatever else needs to be updated
+    # Restart the auto-save timer
+    self.autoSaveTimer.start(1000 * 60 * self.preferences.autoSaveMinutes)
 
   @QtCore.Slot()
   def on_actionSave_All_Notes_triggered(self):
@@ -308,3 +313,8 @@ class PostNoteWindow(QtWidgets.QMainWindow):
   @QtCore.Slot()
   def on_actionExit_PostNote_triggered(self):
     QtCore.QCoreApplication.quit()
+
+  def onAutoSaveTimerTimeout(self):
+    """Idle timeout handler.  Used auto-save dirty notes.
+    """
+    self.noteManager.saveDirtyNotes()

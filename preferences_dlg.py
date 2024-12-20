@@ -84,7 +84,6 @@ class PreferencesDlg(QtWidgets.QDialog):
 
     # Auto-save time
     self.preferences.autoSaveMinutes = self.ui.autosaveSpinBox.value()
-    # TODO: The auto-save timer needs to be restarted
 
     # Double-click action
     self.preferences.doubleClickAction = self.ui.doubleClickActionComboBox.currentIndex()   # TODO: Will this set the Enum properly?
