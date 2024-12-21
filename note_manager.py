@@ -1,5 +1,6 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from note_data import TOPIC_ID, NoteData, NOTE_ID, ENoteSizeEnum
+from note_exporter import NoteExporter
 from note_wnd import NoteWnd
 from preferences import Preferences
 from topic import Topic, kDefaultTopicId
@@ -103,12 +104,27 @@ class NoteManager(QtCore.QObject):
       if noteWnd.topicId == topicId:
         noteWnd.topicId = kDefaultTopicId
 
-  def createNote(self, noteId: NOTE_ID) -> NoteWnd:
+  def createNote(self, noteId: NOTE_ID, useNewId = False) -> NoteWnd:
+    """Creates a new note with the given ID.  If useNewId is True, a new ID will be generated
+       if the given ID is already in use.
+
+    Args:
+        noteId (NOTE_ID): ID of the note to create
+        useNewId (bool, optional): If True, a new ID will be created if the given ID is
+                                   already in use. Defaults to False.
+
+    Returns:
+        NoteWnd: Created note window, or None if the note ID is already in use
+    """
     # First, check that noteId is not already being used
     if noteId in self.noteWndDict:
-      # If noteId does already exist, this is an error condition
-      logging.error(f'[NoteManager.createNote] Note ID {noteId} already exists in the noteWndDict')
-      return
+      if not useNewId:
+        # If noteId does already exist, this is an error condition
+        logging.error(f'[NoteManager.createNote] Note ID {noteId} already exists in the noteWndDict')
+        return
+      else:
+        # Generate a new ID
+        noteId = self.getFreeId()
 
     noteWnd = NoteWnd(self.topicManager)
     noteWnd.noteId = noteId
@@ -118,17 +134,23 @@ class NoteManager(QtCore.QObject):
 
     return noteWnd
 
-  def createPopulatedNote(self, noteData: NoteData):
+  def createPopulatedNote(self, noteData: NoteData, useNewId = False):
     """ Creates a fully-populated note.  Used when loading notes from the database.
+        If useNewId is True, a new ID will be generated if the given ID is already in use.
     """
-    newNote = self.createNote(noteData.noteId)
+    newNote = self.createNote(noteData.noteId, useNewId)
 
-    newNote.noteData = noteData
-    newNote.dirty = False
+    if newNote is not None:
+      noteData.noteId = newNote.noteId    # createNote may have generated a new ID
+      newNote.noteData = noteData
+      newNote.dirty = False
 
-    newNote.showNote()
+      newNote.showNote()
 
-    return newNote
+      return newNote
+    else:
+      logging.error(f'[NoteManager.createPopulatedNote] Error creating note - ID already exists: {noteData.noteId}')
+      return None
 
   def createBlankNote(self, noteSize: ENoteSizeEnum) -> NoteWnd:
     noteId = self.getFreeId()
@@ -179,3 +201,7 @@ class NoteManager(QtCore.QObject):
     highestKey = max(keysInUse) if len(keysInUse) > 0 else 0
 
     return highestKey + 1
+
+  def addNotesToExporter(self, noteExporter: NoteExporter):
+    for noteWnd in self.noteWndDict.values():
+      noteExporter.addNote(noteWnd.noteData)
