@@ -303,7 +303,6 @@ class NoteWnd(QtWidgets.QWidget):
     # system modifications so that the lastUpdateTime is only for user modifications.
     if self.modificationAllowed:
       if self.ui.textEdit.document().isModified():
-        print('Note has been changed')
         self.dirty = True
 
   @QtCore.Slot()
