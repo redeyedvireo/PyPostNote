@@ -355,12 +355,12 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot()
   def on_actionAbout_Qt_triggered(self):
-    QtWidgets.QMessageBox.aboutQt(None)
+    QtWidgets.QMessageBox.aboutQt(self)
 
   @QtCore.Slot()
   def on_actionAbout_PostNote_triggered(self):
-    # TODO: Implement
-    print('About PostNote')
+    aboutString = 'PostNote 5\t\t\t\nBy Jeff Geraci'      # The tabs are used to increase the width of the dialog
+    QtWidgets.QMessageBox.about(self, 'About PostNote', aboutString)
 
   @QtCore.Slot()
   def on_actionExit_PostNote_triggered(self):
