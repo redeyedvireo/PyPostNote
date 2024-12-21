@@ -62,9 +62,50 @@ class Database:
     pass
 
   def createNewDatabase(self):
-    # TODO: Create database tables: Globals, Note, Topic
-    # TODO: Initialize global data
-    pass
+    # Create database tables
+    self.createNotesTable()
+    self.createTopicsTable()
+
+  def createNotesTable(self):
+    createStr = """create table notes (
+            noteid integer primary key,
+            title text,
+            notetext text,
+            geometry blob,
+            added integer,
+            lastupdated integer,
+            topicid integer,
+            usesowncolors integer,
+            alwaysontop integer,
+            textcolor integer,
+            bgcolor integer,
+            bgtype integer,
+            transparency integer)"""
+
+    queryObj = QtSql.QSqlQuery()
+
+    if not queryObj.exec_(createStr):
+      self.reportError(f'[createNotesTable]: {queryObj.lastError().text()}')
+      return False
+
+    return True
+
+  def createTopicsTable(self):
+    createStr = """create table topics (
+            id integer primary key,
+            name text,
+            textcolor integer,
+            bgcolor integer,
+            bgtype integer,
+            transparency integer)"""
+
+    queryObj = QtSql.QSqlQuery()
+
+    if not queryObj.exec_(createStr):
+      self.reportError(f'[createTopicsTable]: {queryObj.lastError().text()}')
+      return False
+
+    return True
 
   def getQueryField(self, queryObj, fieldName) -> int | str | bytes | None:
     fieldIndex = queryObj.record().indexOf(fieldName)
