@@ -1,5 +1,6 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from ui_edit_toolbar import Ui_EditToolbar
+from util import copyQSize
 import logging
 
 class EditToolbar(QtWidgets.QWidget):
@@ -27,8 +28,9 @@ class EditToolbar(QtWidgets.QWidget):
     super(EditToolbar, self).closeEvent(event)
     self.toolbarClosing.emit()
 
-  def showEditToolbar(self, pos: QtCore.QPoint, size: QtCore.QSize):
-    self.moveEditToolbar(pos, size)
+  def showEditToolbar(self, pos: QtCore.QPoint, size: QtCore.QSize, textCursor: QtGui.QTextCursor):
+    self.moveEditToolbar(pos, copyQSize(size))
+    self.setFontCombos(textCursor)
     self.show()
 
   def moveEditToolbar(self, pos: QtCore.QPoint, size: QtCore.QSize):
@@ -64,6 +66,11 @@ class EditToolbar(QtWidgets.QWidget):
 
     self.move(x, y)
 
+  def setFontCombos(self, textCursor: QtGui.QTextCursor):
+    charFormat = textCursor.charFormat()
+    self.setFontFamily(charFormat.fontFamily())
+    self.setFontSize(charFormat.fontPointSize())
+
   def setFontFamily(self, family: str):
     if len(family) > 0:
       index = self.ui.fontComboBox.findText(family)
@@ -87,8 +94,9 @@ class EditToolbar(QtWidgets.QWidget):
       self.ui.sizeComboBox.addItem(f'{size}')
 
   def setFontSize(self, fontSize: int):
-    if fontSize > 0:
-      index = self.ui.sizeComboBox.findText(f'{fontSize}')
+    intFontSize = int(fontSize)
+    if intFontSize > 0:
+      index = self.ui.sizeComboBox.findText(f'{intFontSize}')
 
       if index != -1:
         self.ui.sizeComboBox.setCurrentIndex(index)

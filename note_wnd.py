@@ -170,6 +170,9 @@ class NoteWnd(QtWidgets.QWidget):
     self.setNoteTransparency(transparency)
     self.setAlwaysOnTopness(self.alwaysOnTop)
 
+  def setDefaultFont(self, fontFamily: str, fontSize: int):
+    self.ui.textEdit.setDefaultFont(fontFamily, fontSize)
+
   def setNoteGeometry(self, geometry: QtCore.QByteArray):
     # TODO: I think this is what causes the issue where all windows appear in the center of the screen.  There needs to be
     #       some way of checking if the note's window exists, and if the note's rectangle is within this window.  It might

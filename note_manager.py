@@ -35,7 +35,6 @@ class NoteManager(QtCore.QObject):
   @defaultNoteFontFamily.setter
   def defaultNoteFontFamily(self, fontFamily: str):
     self.preferences.defaultFontFamily = fontFamily
-    # TODO: Save preferences?
 
   @property
   def defaultNoteFontSize(self) -> int:
@@ -44,7 +43,6 @@ class NoteManager(QtCore.QObject):
   @defaultNoteFontSize.setter
   def defaultNoteFontSize(self, size: int):
     self.preferences.defaultFontSize = size
-    # TODO: Save preferences?
 
   def allNoteIds(self) -> list[NOTE_ID]:
     """Returns a list of all note IDs
@@ -128,6 +126,8 @@ class NoteManager(QtCore.QObject):
 
     noteWnd = NoteWnd(self.topicManager)
     noteWnd.noteId = noteId
+
+    noteWnd.setDefaultFont(self.defaultNoteFontFamily, self.defaultNoteFontSize)
 
     # Add to noteWndDict
     self.noteWndDict[noteId] = noteWnd

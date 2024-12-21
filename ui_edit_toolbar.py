@@ -45,6 +45,7 @@ class Ui_EditToolbar(object):
 
         self.sizeComboBox = QComboBox(EditToolbar)
         self.sizeComboBox.setObjectName(u"sizeComboBox")
+        self.sizeComboBox.setMinimumSize(QSize(65, 0))
         self.sizeComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.horizontalLayout.addWidget(self.sizeComboBox)
