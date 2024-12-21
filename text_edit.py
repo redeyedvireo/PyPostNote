@@ -85,6 +85,10 @@ class TextEdit(QtWidgets.QTextEdit):
     fontSize = selectionFormat.fontPointSize()
     self.editToolbar.setFontSize(fontSize)
 
+  def getFontSizeOfSelection(self):
+    selectionCursor, selectionFormat = self.getCursorAndSelectionFormat()
+    return selectionFormat.fontPointSize()
+
   def getCursorAndSelectionFormat(self) -> tuple[QtGui.QTextCursor, QtGui.QTextCharFormat]:
     selectionCursor = self.textCursor()
     selectionFormat = selectionCursor.charFormat()
@@ -108,7 +112,7 @@ class TextEdit(QtWidgets.QTextEdit):
 
   def onEditToolbarTriggered(self):
     self.editToolbar = EditToolbar(self.parent())
-    self.editToolbar.showEditToolbar(self.theParent.pos(), self.theParent.size())
+    self.editToolbar.showEditToolbar(self.theParent.pos(), self.theParent.size(), self.textCursor())
 
     self.editToolbar.toolbarClosing.connect(self.onToolbarClosing)
     self.editToolbar.fontSizeChanged.connect(self.onFontSizeChanged)
@@ -158,13 +162,6 @@ class TextEdit(QtWidgets.QTextEdit):
   @QtCore.Slot()
   def on_selectionChanged(self):
     self.updateFontControls()
-    selCursor = self.textCursor()
-
-    # TODO: I think this code can be deleted; I think it was only relevant when there was a global toolbar.
-    # if selCursor.hasSelection():
-    #   # If the edit toolbar is visible, move it here
-    #   if self.editToolbar is not None:
-    #     self.editToolbar.moveEditToolbar(self.parent)
 
   @QtCore.Slot()
   def on_cursorPositionChanged(self):
@@ -188,6 +185,10 @@ class TextEdit(QtWidgets.QTextEdit):
 
     tempCharFormat.setFontFamily(fontFamily)
     self.mergeCharFormat(tempCharFormat, selectionCursor)
+
+    # Update font size combo
+    fontSize = self.getFontSizeOfSelection()
+    self.editToolbar.setFontSize(fontSize)
 
   def onLeftAlignTriggered(self):
     selectionCursor, selectionFormat = self.getCursorAndBlockFormat()

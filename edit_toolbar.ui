@@ -43,6 +43,12 @@
      </item>
      <item>
       <widget class="QComboBox" name="sizeComboBox">
+       <property name="minimumSize">
+        <size>
+         <width>65</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="focusPolicy">
         <enum>Qt::FocusPolicy::NoFocus</enum>
        </property>
