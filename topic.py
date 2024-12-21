@@ -4,8 +4,6 @@ from PySide6 import QtCore, QtWidgets, QtGui
 kInvalidTopicId = 0
 kDefaultTopicId = 1
 
-# TODO: Since both notes and topics have some of the same properties (textColor, bgColor, bgType, and transparency),
-#       maybe they should be refactored into a class.
 
 class TopicData:
   """ Topic data from the database.
@@ -15,7 +13,7 @@ class TopicData:
     self.name = ''
     self.textColor = QtGui.QColor('black')
     self.bgColor = QtGui.QColor('yellow')
-    self.bgType = 0
+    self.bgType = ENoteBackground.eSolid
     self.transparency = 100
 
 
@@ -25,7 +23,27 @@ class Topic:
     self.topicName = topicName
     self.topicStyle = NoteStyle()
 
-    # Use @properties for the functions that set and get various properties that are stored in NoteStyle
+  @property
+  def topicData(self) -> TopicData:
+    outTopicData = TopicData()
+
+    outTopicData.id = self.id
+    outTopicData.name = self.topicName
+    outTopicData.textColor = self.topicStyle.textColor
+    outTopicData.bgColor = self.topicStyle.backgroundColor
+    outTopicData.bgType = self.topicStyle.backgroundType
+    outTopicData.transparency = self.topicStyle.transparency
+
+    return outTopicData
+
+  @topicData.setter
+  def topicData(self, topicData: TopicData):
+    self.id = topicData.id
+    self.topicName = topicData.name
+    self.topicStyle.textColor = topicData.textColor
+    self.topicStyle.backgroundColor = topicData.bgColor
+    self.topicStyle.backgroundType = topicData.bgType
+    self.topicStyle.transparency = topicData.transparency
 
   @property
   def backgroundColor(self) -> QtGui.QColor:

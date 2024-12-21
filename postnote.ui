@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>224</width>
-     <height>21</height>
+     <height>33</height>
     </rect>
    </property>
   </widget>
@@ -50,9 +50,14 @@
     <string>Show Note</string>
    </property>
   </action>
+  <action name="actionImport_Notes">
+   <property name="text">
+    <string>Import Notes...</string>
+   </property>
+  </action>
   <action name="actionExport_Notes">
    <property name="text">
-    <string>Export Notes</string>
+    <string>Export Notes...</string>
    </property>
   </action>
   <action name="actionEdit_Topics">

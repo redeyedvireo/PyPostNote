@@ -80,7 +80,7 @@ class NoteWnd(QtWidgets.QWidget):
 
     self.noteStyle.textColor = data.textColor
     self.noteStyle.backgroundColor = data.bgColor
-    self.noteStyle.backgroundType = ENoteBackground(data.bgType)
+    self.noteStyle.backgroundType = data.bgType
     self.noteStyle.transparency = data.transparency
 
     self.updateNote()

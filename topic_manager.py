@@ -1,5 +1,6 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from note_data import TOPIC_ID
+from note_exporter import NoteExporter
 from topic import Topic, TopicData, kDefaultTopicId
 import logging
 
@@ -67,15 +68,17 @@ class TopicManager(QtCore.QObject):
     # First, check that the topicId is not already being used.
     if topicData.id in self.topicMap:
       # Topic is already being used
-      logging.error(f'[TopicManager.addTopicFromTopicData] addTopic called with pre-existing topic ID: {topicData.id}')
-      return
+      inUseTopic = self.topicMap[topicData.id]
+
+      if inUseTopic.topicName == topicData.name:
+        # If the topic names are the same, then assume this topic is the same as the one already in use
+        return
+      else:
+        # Same ID but different topic names.  In this case, create a new topic ID
+        topicData.id = self.getFreeId()
 
     newTopic = Topic(topicData.name)
-    newTopic.id = topicData.id
-    newTopic.topicStyle.textColor = topicData.textColor
-    newTopic.topicStyle.backgroundColor = topicData.bgColor
-    newTopic.topicStyle.backgroundType = topicData.bgType
-    newTopic.topicStyle.transparency = topicData.transparency
+    newTopic.topicData = topicData
 
     self.addTopic(newTopic, False)    # Don't add to the database, since this data has just come from the database
 
@@ -89,8 +92,14 @@ class TopicManager(QtCore.QObject):
     # First, check that the topicId is not already being used.
     if topic.id in self.topicMap:
       # Topic is already being used
-      logging.error(f'[TopicManager.addTopic] addTopic called with pre-existing topic ID: {topic.id}')
-      return
+      inUseTopic = self.topicMap[topic.id]
+
+      if inUseTopic.topicName == topic.topicName:
+        # If the topic names are the same, then assume this topic is the same as the one already in use
+        return
+      else:
+        # Same ID but different topic names.  In this case, create a new topic ID
+        topic.id = self.getFreeId()
 
     self.topicMap[topic.id] = topic
 
@@ -132,3 +141,12 @@ class TopicManager(QtCore.QObject):
     highestKey = max(keysInUse) if len(keysInUse) > 0 else 2
 
     return highestKey + 1
+
+  def addTopicsToExporter(self, exporter: NoteExporter):
+    """Adds all topics to the exporter.
+
+    Args:
+        exporter: Exporter to add topics to
+    """
+    for topic in self.topicMap.values():
+      exporter.addTopic(topic.topicData)

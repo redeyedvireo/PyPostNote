@@ -1,6 +1,8 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from database import Database
 from note_data import TOPIC_ID, NoteData, ENoteSizeEnum
+from note_exporter import NoteExporter
+from note_importer import NoteImporter
 from note_manager import NoteManager
 from note_style import ENoteBackground
 from note_wnd import NoteWnd
@@ -120,6 +122,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.noteListMenu = QtWidgets.QMenu('Show Note', self)
     self.trayIconMenu.addMenu(self.noteListMenu)
 
+    self.trayIconMenu.addAction(self.ui.actionImport_Notes)
     self.trayIconMenu.addAction(self.ui.actionExport_Notes)
     self.trayIconMenu.addAction(self.ui.actionEdit_Topics)
     self.trayIconMenu.addAction(self.ui.actionPreferences)
@@ -269,9 +272,58 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.createNewNote(ENoteSizeEnum.eExLargeNote)
 
   @QtCore.Slot()
+  def on_actionImport_Notes_triggered(self):
+    options = QtWidgets.QFileDialog.Options()
+    fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Import Notes", "",
+                                                        "JSON Files (*.json);;All Files (*)",
+                                                        options=options)
+
+    if fileName is not None:
+      noteImporter = NoteImporter()
+      result = noteImporter.importNotes(fileName)
+
+      errorsOccurred = False
+
+      if type(result) is tuple:
+        notes, topics = result
+
+        for topicData in topics:
+          self.topicManager.addTopicFromTopicData(topicData)
+
+        for noteData in notes:
+          # Create the note window.  If the note's ID already exists, a new ID will be generated.
+          noteWnd = self.noteManager.createPopulatedNote(noteData, True)
+
+          if noteWnd is not None:
+            noteData.noteId = noteWnd.noteId    # createPopulatedNote() may have generated a new ID
+            success = self.db.addNote(noteData)
+
+            if success:
+              self.connectNoteSignals(noteWnd)
+            else:
+              logging.error(f'[PostNoteWindow.on_actionImport_Notes_triggered] Error saving note {noteData.title}')
+              errorsOccurred = True
+          else:
+            logging.error(f'[PostNoteWindow.on_actionImport_Notes_triggered] Error creating note {noteData.title}')
+            errorsOccurred = True
+
+      if errorsOccurred:
+        QtWidgets.QMessageBox.warning(self,
+                                      "Import Notes",
+                                      "Some notes could not be created.")
+
+  @QtCore.Slot()
   def on_actionExport_Notes_triggered(self):
-    # TODO: Implement
-    print('Export notes')
+    options = QtWidgets.QFileDialog.Options()
+    fileName, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Export Notes", "",
+                                                        "JSON Files (*.json);;All Files (*)",
+                                                        options=options)
+
+    if fileName is not None:
+      noteExporter = NoteExporter()
+      self.noteManager.addNotesToExporter(noteExporter)
+      self.topicManager.addTopicsToExporter(noteExporter)
+      noteExporter.export(fileName)
 
   @QtCore.Slot()
   def on_actionEdit_Topics_triggered(self):
