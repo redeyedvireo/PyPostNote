@@ -10,6 +10,7 @@ class TextEdit(QtWidgets.QTextEdit):
     super(TextEdit, self).__init__(parent)
     self.theParent: QtWidgets.QWidget = parent
     self.editToolbar = None
+    self.hasBeenClicked = False   # The edit control has not yet been clicked
     self.setFocusPolicy(QtCore.Qt.FocusPolicy.WheelFocus)
 
     self.selectionChanged.connect(self.on_selectionChanged)
@@ -43,7 +44,12 @@ class TextEdit(QtWidgets.QTextEdit):
 
     menu.addSeparator()
 
-    menu.addAction('Edit Toolbar', self.onEditToolbarTriggered)
+    if self.hasBeenClicked:
+      # Workaround for the issue where invoking the edit toolbar before the note has been
+      # clicked causes the app to crash.  Only show the Edit Toolbar menu item if the note
+      # has been clicked.
+      menu.addAction('Edit Toolbar', self.onEditToolbarTriggered)
+
     menu.addAction('Entire Note to Default Font', self.onToDefaultFontTriggered)
 
     menu.exec_(event.globalPos())
@@ -58,6 +64,15 @@ class TextEdit(QtWidgets.QTextEdit):
     super(TextEdit, self).focusOutEvent(event)
 
     self.TE_LostFocus.emit()
+
+  def mousePressEvent(self, e):
+    # There is a weird issue where invoking the edit toolbar causes the app to crash
+    # if the use has not clicked, with the left mouse button. on the edit control.
+    # More investigation is needed.
+    if e.button() == QtCore.Qt.MouseButton.LeftButton:
+      self.hasBeenClicked = True
+
+    return super().mousePressEvent(e)
 
   def insertFromMimeData(self, source: QtCore.QMimeData):
     if source.hasHtml():
@@ -112,7 +127,6 @@ class TextEdit(QtWidgets.QTextEdit):
 
   def onEditToolbarTriggered(self):
     self.editToolbar = EditToolbar(self.parent())
-    self.editToolbar.showEditToolbar(self.theParent.pos(), self.theParent.size(), self.textCursor())
 
     self.editToolbar.toolbarClosing.connect(self.onToolbarClosing)
     self.editToolbar.fontSizeChanged.connect(self.onFontSizeChanged)
@@ -127,6 +141,8 @@ class TextEdit(QtWidgets.QTextEdit):
     self.editToolbar.bulletListTriggered.connect(self.onBulletListTriggered)
     self.editToolbar.numberListTriggered.connect(self.onNumberListTriggered)
     self.editToolbar.tableTriggered.connect(self.onTableTriggered)
+
+    self.editToolbar.showEditToolbar(self.theParent.pos(), self.theParent.size(), self.textCursor())
 
   def onToDefaultFontTriggered(self):
     selectionCursor = self.textCursor()
