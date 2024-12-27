@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EditToolbar</class>
+ <widget class="QWidget" name="EditToolbar">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>262</width>
+    <height>51</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Edit</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>1</number>
+   </property>
+   <property name="margin" stdset="0">
+    <number>1</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item>
+      <widget class="QFontComboBox" name="fontComboBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Change Font Family</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="sizeComboBox">
+       <property name="minimumSize">
+        <size>
+         <width>65</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Change Font Size</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item>
+      <widget class="QToolButton" name="leftAlignButton">
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Align Left</string>
+       </property>
+       <property name="text">
+        <string>L</string>
+       </property>
+       <property name="icon">
+        <iconset resource="postnote.qrc">
+         <normaloff>:/PostNote/Resources/Left.png</normaloff>:/PostNote/Resources/Left.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="centerAlignButton">
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Align Center</string>
+       </property>
+       <property name="text">
+        <string>C</string>
+       </property>
+       <property name="icon">
+        <iconset resource="postnote.qrc">
+         <normaloff>:/PostNote/Resources/Center.png</normaloff>:/PostNote/Resources/Center.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="rightAlignButton">
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Align Right</string>
+       </property>
+       <property name="text">
+        <string>R</string>
+       </property>
+       <property name="icon">
+        <iconset resource="postnote.qrc">
+         <normaloff>:/PostNote/Resources/Right.png</normaloff>:/PostNote/Resources/Right.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="boldButton">
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Bold</string>
+       </property>
+       <property name="text">
+        <string>B</string>
+       </property>
+       <property name="icon">
+        <iconset resource="postnote.qrc">
+         <normaloff>:/PostNote/Resources/Bold.png</normaloff>:/PostNote/Resources/Bold.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="italicButton">
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Italic</string>
+       </property>
+       <property name="text">
+        <string>I</string>
+       </property>
+       <property name="icon">
+        <iconset resource="postnote.qrc">
+         <normaloff>:/PostNote/Resources/Italic.png</normaloff>:/PostNote/Resources/Italic.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="underlineButton">
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Underline</string>
+       </property>
+       <property name="text">
+        <string>U</string>
+       </property>
+       <property name="icon">
+        <iconset resource="postnote.qrc">
+         <normaloff>:/PostNote/Resources/Underline.png</normaloff>:/PostNote/Resources/Underline.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>18</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="horizontalLineButton">
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Insert Horizontal Line</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="postnote.qrc">
+         <normaloff>:/PostNote/Resources/Horiz Line.png</normaloff>:/PostNote/Resources/Horiz Line.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="bulletListInsertButton">
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Insert Bulleted List</string>
+       </property>
+       <property name="text">
+        <string>Bl</string>
+       </property>
+       <property name="icon">
+        <iconset resource="postnote.qrc">
+         <normaloff>:/PostNote/Resources/Bullet Table.png</normaloff>:/PostNote/Resources/Bullet Table.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="numberListInsertButton">
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Insert Numbered List</string>
+       </property>
+       <property name="text">
+        <string>N</string>
+       </property>
+       <property name="icon">
+        <iconset resource="postnote.qrc">
+         <normaloff>:/PostNote/Resources/Number Table.png</normaloff>:/PostNote/Resources/Number Table.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="tableInsertButton">
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Insert Table</string>
+       </property>
+       <property name="text">
+        <string>Tb</string>
+       </property>
+       <property name="icon">
+        <iconset resource="postnote.qrc">
+         <normaloff>:/PostNote/Resources/Table.png</normaloff>:/PostNote/Resources/Table.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="postnote.qrc"/>
+ </resources>
+ <connections/>
+</ui>
