@@ -1,5 +1,5 @@
 # PyPostNote
-A program to create notes on the desktop
+A program to create notes on the desktop.
 
 To run:
 python PyPostNote.py
