@@ -1,4 +1,5 @@
 from PySide6 import QtCore, QtWidgets, QtGui
+from about_dlg import AboutDlg
 from database import Database
 from note_data import TOPIC_ID, NoteData, ENoteSizeEnum
 from note_exporter import NoteExporter
@@ -15,7 +16,7 @@ from ui_postnote import Ui_PostNoteClass
 from edit_topics_dialog import EditTopicsDialog
 import logging
 
-from util import getDatabasePath, getPrefsPath
+from util import getDatabasePath, getPrefsPath, getStorageDirectory
 
 kAppName = 'PyPostNote'
 kDatabaseName = 'Notes.db'
@@ -129,8 +130,8 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
 
     self.trayIconMenu.addSeparator()
-    self.trayIconMenu.addAction(self.ui.actionAbout_Qt)
     self.trayIconMenu.addAction(self.ui.actionAbout_PostNote)
+    self.trayIconMenu.addAction(self.ui.actionAbout_Qt)
 
     self.trayIconMenu.addSeparator()
     self.trayIconMenu.addAction(self.ui.actionExit_PostNote)
@@ -359,8 +360,8 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot()
   def on_actionAbout_PostNote_triggered(self):
-    aboutString = 'PostNote 5\t\t\t\nBy Jeff Geraci'      # The tabs are used to increase the width of the dialog
-    QtWidgets.QMessageBox.about(self, 'About PostNote', aboutString)
+    dlg = AboutDlg(getStorageDirectory(kAppName), self)
+    dlg.exec_()
 
   @QtCore.Slot()
   def on_actionExit_PostNote_triggered(self):

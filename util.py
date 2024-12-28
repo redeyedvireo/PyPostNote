@@ -3,6 +3,7 @@ import os.path
 from pathlib import Path
 import platform
 import datetime
+import logging
 from PySide6 import QtCore, QtWidgets, QtGui
 
 def getScriptPath():
@@ -16,45 +17,45 @@ def getScriptPath():
 
   return application_path
 
+def getStorageDirectory(applicationName: str) -> str:
+  """Returns the directory where the database (Notes.db) and preferences (PyPostNote.ini) files
+  are stored.
+
+  Args:
+      applicationName (str): Application name.
+
+  Returns:
+      str: Directory where the database and preferences files are stored.
+  """
+  if platform.system() == 'Windows':
+    # This attempts to use whatever directory is in the APPDATA environment variable, if it exists.
+    # If the APPDATA environment variable doesn't exist, the application directory is used.
+    directory = os.getenv('APPDATA', getScriptPath())
+    return os.path.join(directory, applicationName)
+
+  elif platform.system() == 'Linux':
+    # On Linux, use "~/.PyPostNote"
+    homeDirObj = Path.home()
+    appDataDir = homeDirObj / f'.{applicationName}'
+    return os.fspath(appDataDir)
+
+  else:
+    logging.error('The application data directory is currently only supported on Windows and Linux')
+    return ''
+
 def getDatabasePath(applicationName: str, databaseName: str) -> str:
   """Returns the complete path of the database.
 
   Returns:
       str: App data directory.
   """
-  if platform.system() == 'Windows':
-    # This attempts to use whatever directory is in the APPDATA environment variable, if it exists.
-    # If the APPDATA environment variable doesn't exist, the application directory is used.
-    directory = os.getenv('APPDATA', getScriptPath())
-    return os.path.join(directory, applicationName, databaseName)
-
-  elif platform.system() == 'Linux':
-    # On Linux, use "~/.PyPostNote/Notes.db"
-    homeDirObj = Path.home()
-    appDataDir = homeDirObj / f'.{applicationName}' / databaseName
-    return os.fspath(appDataDir)
-
-  else:
-    print('The application data directory is currently only supported on Windows and Linux')
-    return ''
+  dataDirectory = getStorageDirectory(applicationName)
+  return os.path.join(dataDirectory, databaseName)
 
 def getPrefsPath(applicationName: str, prefsFileName: str) -> str:
   """ Returns the full path to the prefs file. """
-  if platform.system() == 'Windows':
-    # This attempts to use whatever directory is in the APPDATA environment variable, if it exists.
-    # If the APPDATA environment variable doesn't exist, the application directory is used.
-    directory = os.getenv('APPDATA', getScriptPath())
-    return os.path.join(directory, applicationName, prefsFileName)
-
-  elif platform.system() == 'Linux':
-    # On Linux, use "~/.PyPostNote/PyPostNote.ini"
-    homeDirObj = Path.home()
-    appDataDir = homeDirObj / f'.{applicationName}' / prefsFileName
-    return os.fspath(appDataDir)
-
-  else:
-    print('The application data directory is currently only supported on Windows and Linux')
-    return ''
+  dataDirectory = getStorageDirectory(applicationName)
+  return os.path.join(dataDirectory, prefsFileName)
 
 def copyQRect(src: QtCore.QRect) -> QtCore.QRect:
   """Makes a deep copy of a QRect.  Simply assigning one QRect to another one will not perform a
