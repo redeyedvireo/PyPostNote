@@ -76,13 +76,9 @@ class NoteWnd(QtWidgets.QWidget):
   def noteData(self, data: NoteData):
     self.setWindowTitle(data.title)
     self.setNoteGeometry(data.geometryData)
-    # Don't set the x and y here.  This will only be used if there is a discrepancy between the note's
+    # Don't set the x, y, width, or height here.  This will only be used if there is a discrepancy between the note's
     #  position and the position of the window.  This will typically happen if the notes are saved on one
     #  type of monitor configuration, and then loaded on a different monitor configuration.
-    # self.x = data.x
-    # self.y = data.y
-    # self.width = data.width
-    # self.height = data.height
     self.ui.textEdit.setHtml(data.contentsData)
     self.noteId = data.noteId
     self.noteCreationTime = data.addedTime
@@ -98,8 +94,8 @@ class NoteWnd(QtWidgets.QWidget):
 
     self.updateNote()
 
-    # DEBUG
-    printGeometry(data.geometryData.data())
+    # Keeping this here for debugging
+    # printGeometry(data.geometryData.data())
 
   @property
   def dirty(self) -> bool:

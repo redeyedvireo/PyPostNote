@@ -150,8 +150,11 @@ class NoteManager(QtCore.QObject):
       newNote.noteData = noteData
       newNote.dirty = False
 
-      self.fixNoteSize(newNote, noteData)
-      self.fixNotePosition(newNote, noteData)
+      if noteData.width is not None and noteData.height is not None:
+        self.fixNoteSize(newNote, noteData)
+
+      if noteData.x is not None and noteData.y is not None:
+        self.fixNotePosition(newNote, noteData)
 
       newNote.showNote()
 
@@ -175,6 +178,7 @@ class NoteManager(QtCore.QObject):
 
     if abs(savedWidth - currentWidth) > 20 or abs(savedHeight - currentHeight) > 20:
       noteWnd.resize(QtCore.QSize(savedWidth, savedHeight))
+      logging.info(f'[NoteManager.fixNoteSize] Resizing note {noteWnd.noteId} to {savedWidth}x{savedHeight}')
 
   def fixNotePosition(self, noteWnd: NoteWnd, noteData: NoteData):
     """If the note's size and position are radically different from their saved values, restore
@@ -188,8 +192,8 @@ class NoteManager(QtCore.QObject):
     currentX = noteWnd.x()
     savedY = noteData.y
     currentY = noteWnd.geometry().y()
-    frameY = noteWnd.frameGeometry().y()
-    justY = noteWnd.y()
+
+    noteWasMoved = False
 
     # This is weird.  The note's saved position will always be different from the position in the
     # saveGeometry() call.  Regardless of whether the note is moved here, it always seems to end
@@ -200,6 +204,7 @@ class NoteManager(QtCore.QObject):
     if abs(savedX - currentX) > 20 or abs(savedY - currentY) > 40:
       # The note's position is too far off from the saved position, so move it.
       noteWnd.move(savedX, savedY)
+      noteWasMoved = True
 
       # Make sure that the note is still on the screen.
       screenContainingNote = noteWnd.screen()
@@ -214,25 +219,33 @@ class NoteManager(QtCore.QObject):
           # The note is too far to the right
           noteGeometry.moveRight(screenGeometry.right() - 1)
           noteWnd.move(noteGeometry.topLeft())
+          noteWasMoved = True
 
         if noteGeometry.bottom() > screenGeometry.bottom():
           # The note is too far down
           noteGeometry.moveBottom(screenGeometry.bottom() - 1)
           noteWnd.move(noteGeometry.topLeft())
+          noteWasMoved = True
 
       if not screenGeometry.contains(noteGeometry):
         # If it's still not on the screen, adjust its left and top positions
         if noteGeometry.left() < screenGeometry.left():
           noteGeometry.moveLeft(screenGeometry.left() + 1)
           noteWnd.move(noteGeometry.topLeft())
+          noteWasMoved = True
 
         if noteGeometry.top() < screenGeometry.top():
           noteGeometry.moveTop(screenGeometry.top() + 1)
           noteWnd.move(noteGeometry.topLeft())
+          noteWasMoved = True
 
       if not screenGeometry.contains(noteGeometry):
         # If it's still not on the screen, just move it to the center of the screen
         noteWnd.move(screenGeometry.center() - noteGeometry.center())
+        noteWasMoved = True
+
+    if noteWasMoved:
+      logging.info(f'[NoteManager.fixNotePosition] Note {noteWnd.noteId} was moved to {noteWnd.x()}, {noteWnd.y()}')
 
   def createBlankNote(self, noteSize: ENoteSizeEnum) -> NoteWnd:
     noteId = self.getFreeId()

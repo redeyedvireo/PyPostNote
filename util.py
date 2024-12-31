@@ -121,3 +121,6 @@ def printGeometry(geometry: bytes):
   print(f'Maximized: {results[12]}')
   print(f'FullScreen: {results[13]}')
   print(f'Screen width: {results[14]}')
+
+def bytesToQByteArray(data: bytes) -> QtCore.QByteArray:
+  return QtCore.QByteArray(data)
