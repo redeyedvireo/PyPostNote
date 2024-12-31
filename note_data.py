@@ -19,6 +19,10 @@ class NoteData:
   def __init__(self):
     self.noteId = kInvalidNote
     self.geometryData: QtCore.QByteArray = QtCore.QByteArray()
+    self.x = 0
+    self.y = 0
+    self.width = 0
+    self.height = 0
     self.title = ''
     self.contentsData = ''
     self.addedTime = datetime.datetime.now()		# When created

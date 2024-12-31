@@ -80,7 +80,12 @@ class Database:
             textcolor integer,
             bgcolor integer,
             bgtype integer,
-            transparency integer)"""
+            transparency integer,
+            x integer,
+            y integer,
+            width integer,
+            height integer
+            )"""
 
     queryObj = QtSql.QSqlQuery()
 
@@ -164,7 +169,7 @@ class Database:
     queryObj = QtSql.QSqlQuery()
     queryObj.prepare("""update notes set title=?, notetext=?, geometry=?, added=?,
 		                          lastupdated=?, topicid=?, usesowncolors=?, alwaysontop=?, textcolor=?,
-                              bgcolor=?, bgtype=?, transparency=? where noteid=?""")
+                              bgcolor=?, bgtype=?, transparency=?, x=?, y=?, width=?, height=? where noteid=?""")
 
     queryObj.addBindValue(noteData.title)
     queryObj.addBindValue(noteData.contentsData)
@@ -178,6 +183,10 @@ class Database:
     queryObj.addBindValue(noteData.bgColor.rgba())
     queryObj.addBindValue(noteData.bgType.value)
     queryObj.addBindValue(noteData.transparency)
+    queryObj.addBindValue(noteData.x)
+    queryObj.addBindValue(noteData.y)
+    queryObj.addBindValue(noteData.width)
+    queryObj.addBindValue(noteData.height)
     queryObj.addBindValue(noteData.noteId)
 
     queryObj.exec_()
@@ -223,7 +232,7 @@ class Database:
     queryObj = QtSql.QSqlQuery()
     queryObj.prepare("""select noteid, title, notetext, geometry, added,
                         lastupdated, topicid, usesowncolors, alwaysontop, textcolor, bgcolor, bgtype,
-                        transparency from notes""")
+                        transparency, x, y, width, height from notes""")
 
     queryObj.exec_()
 
@@ -253,6 +262,10 @@ class Database:
       noteData.bgColor = QtGui.QColor.fromRgba(self.getQueryField(queryObj, 'bgcolor'))
       noteData.bgType = ENoteBackground(self.getQueryField(queryObj, 'bgtype'))
       noteData.transparency = self.getQueryField(queryObj, 'transparency')
+      noteData.x = self.getQueryField(queryObj, 'x')
+      noteData.y = self.getQueryField(queryObj, 'y')
+      noteData.width = self.getQueryField(queryObj, 'width')
+      noteData.height = self.getQueryField(queryObj, 'height')
 
       notes.append(noteData)
 

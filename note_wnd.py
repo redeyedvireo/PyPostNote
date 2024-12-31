@@ -10,6 +10,8 @@ from note_properties_dlg import NotePropertiesDlg
 import datetime
 import logging
 
+from util import printGeometry
+
 class NoteWnd(QtWidgets.QWidget):
   saveNote = QtCore.Signal(NoteData)
   deleteNote = QtCore.Signal(int)
@@ -52,6 +54,10 @@ class NoteWnd(QtWidgets.QWidget):
 
     outNoteData.noteId = self.noteId
     outNoteData.geometryData = self.saveGeometry()
+    outNoteData.x = self.x()
+    outNoteData.y = self.y()
+    outNoteData.width = self.width()
+    outNoteData.height = self.height()
     outNoteData.title = self.windowTitle()
     outNoteData.contentsData = self.ui.textEdit.toHtml()
     outNoteData.addedTime = self.noteCreationTime
@@ -70,6 +76,13 @@ class NoteWnd(QtWidgets.QWidget):
   def noteData(self, data: NoteData):
     self.setWindowTitle(data.title)
     self.setNoteGeometry(data.geometryData)
+    # Don't set the x and y here.  This will only be used if there is a discrepancy between the note's
+    #  position and the position of the window.  This will typically happen if the notes are saved on one
+    #  type of monitor configuration, and then loaded on a different monitor configuration.
+    # self.x = data.x
+    # self.y = data.y
+    # self.width = data.width
+    # self.height = data.height
     self.ui.textEdit.setHtml(data.contentsData)
     self.noteId = data.noteId
     self.noteCreationTime = data.addedTime
@@ -84,6 +97,9 @@ class NoteWnd(QtWidgets.QWidget):
     self.noteStyle.transparency = data.transparency
 
     self.updateNote()
+
+    # DEBUG
+    printGeometry(data.geometryData.data())
 
   @property
   def dirty(self) -> bool:
@@ -238,8 +254,6 @@ class NoteWnd(QtWidgets.QWidget):
 
     result = super().resizeEvent(event)
 
-    # TODO: Resizing the button bar breaks it.  Breakage is similar to when
-    #       the rect was not being copied.
     if self.buttonBarWidget is not None:
       self.buttonBarWidget.resizeButtonBar(self.ui.textEdit.rect())
 

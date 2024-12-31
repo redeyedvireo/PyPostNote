@@ -3,6 +3,7 @@ import os.path
 from pathlib import Path
 import platform
 import datetime
+from struct import unpack_from
 import logging
 from PySide6 import QtCore, QtWidgets, QtGui
 
@@ -95,3 +96,28 @@ def createTopicIcon(width: int, height: int, bgColor: QtGui.QColor, textColor: Q
 # Format date
 def formatDateAndTime(inDate: datetime.date) -> str:
   return inDate.strftime("%a %b %d %Y   %I:%M %p")
+
+def printGeometry(geometry: bytes):
+  results = unpack_from('>IHHIIIIIIIIIBBI', geometry)
+  # for index, item in enumerate(results):
+  #   if index == 0:
+  #     print(hex(item))
+  #   else:
+  #     print(item)
+
+  def windowGeometry(x, y, x2, y2):
+    width = x2 - x
+    height = y2 - y
+    return f'x: {x}, y: {y}, width: {width}, height: {height}'
+
+  print(f'Magic Number: {hex(results[0])}')
+  print(f'Major Version: {results[1]}')
+  print(f'Minor Version: {results[2]}')
+  # print(f'Frame Geometry: {results[3]}, {results[4]}, {results[5]}, {results[6]}')
+  print(f'Frame Geometry: {windowGeometry(results[3], results[4], results[5], results[6])}')
+  # print(f'Normal Geometry: {results[7]}, {results[8]}, {results[9]}, {results[10]}')
+  print(f'Normal Geometry: {windowGeometry(results[7], results[8], results[9], results[10])}')
+  print(f'Screen number: {results[11]}')
+  print(f'Maximized: {results[12]}')
+  print(f'FullScreen: {results[13]}')
+  print(f'Screen width: {results[14]}')
