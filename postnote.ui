@@ -120,6 +120,14 @@
     <string>Create an extra large note</string>
    </property>
   </action>
+  <action name="actionDebug_Mode">
+   <property name="text">
+    <string>Debug Mode...</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

@@ -20,7 +20,13 @@ def shutdownApp():
 def getLogfilePath():
   return os.path.join(getScriptPath(), kLogFile)
 
-def main():
+def main(debug: bool):
+  """Main entry point.
+
+  Args:
+      debug (bool): If True, the app will run in debug mode.  In this case,
+                    the database will be named NotesDebug.db.
+  """
   console = logging.StreamHandler()
   rotatingFileHandler = RotatingFileHandler(getLogfilePath(), maxBytes=kMaxLogileSize, backupCount=9)
   logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',
@@ -36,7 +42,7 @@ def main():
   database = Database()
   topicManager = TopicManager()
   noteManager = NoteManager(topicManager, preferences)
-  window = PostNoteWindow(database, noteManager, topicManager, preferences)
+  window = PostNoteWindow(database, noteManager, topicManager, preferences, debug)
 
   window.initialize()
 
@@ -52,4 +58,10 @@ def main():
 
 # ---------------------------------------------------------------
 if __name__ == "__main__":
-  main()
+  debug = False
+  for arg in sys.argv:
+    if arg == 'debug':
+      debug = True
+      break
+
+  main(debug)

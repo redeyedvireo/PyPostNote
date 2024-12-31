@@ -57,6 +57,9 @@ class Ui_PostNoteClass(object):
         self.actionLarge.setObjectName(u"actionLarge")
         self.actionExtra_Large = QAction(PostNoteClass)
         self.actionExtra_Large.setObjectName(u"actionExtra_Large")
+        self.actionDebug_Mode = QAction(PostNoteClass)
+        self.actionDebug_Mode.setObjectName(u"actionDebug_Mode")
+        self.actionDebug_Mode.setMenuRole(QAction.MenuRole.NoRole)
         self.centralWidget = QWidget(PostNoteClass)
         self.centralWidget.setObjectName(u"centralWidget")
         PostNoteClass.setCentralWidget(self.centralWidget)
@@ -106,5 +109,6 @@ class Ui_PostNoteClass(object):
 #if QT_CONFIG(tooltip)
         self.actionExtra_Large.setToolTip(QCoreApplication.translate("PostNoteClass", u"Create an extra large note", None))
 #endif // QT_CONFIG(tooltip)
+        self.actionDebug_Mode.setText(QCoreApplication.translate("PostNoteClass", u"Debug Mode...", None))
     # retranslateUi
 

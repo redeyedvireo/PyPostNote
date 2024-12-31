@@ -14,21 +14,23 @@ from topic import Topic
 from topic_manager import TopicManager
 from ui_postnote import Ui_PostNoteClass
 from edit_topics_dialog import EditTopicsDialog
+from util import getDatabasePath, getPrefsPath, getStorageDirectory
 import logging
 
-from util import getDatabasePath, getPrefsPath, getStorageDirectory
 
 kAppName = 'PyPostNote'
 kDatabaseName = 'Notes.db'
+kDatabaseNameDebug = 'NotesDebug.db'
 kPrefsName = 'PyPostNote.ini'
 
 class PostNoteWindow(QtWidgets.QMainWindow):
-
-  def __init__(self, db: Database, noteManager: NoteManager, topicManager: TopicManager, preferences: Preferences):
+  def __init__(self, db: Database, noteManager: NoteManager, topicManager: TopicManager, preferences: Preferences, debug: bool):
     super(PostNoteWindow, self).__init__()
 
     self.ui = Ui_PostNoteClass()
     self.ui.setupUi(self)
+
+    self.debug = debug
 
     self.noteManager = noteManager
     self.topicManager = topicManager
@@ -52,7 +54,9 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
     self.preferences.readPrefsFile(preferencesPath)
 
-    databasePath = getDatabasePath(kAppName, kDatabaseName)
+    databaseName = kDatabaseName if not self.debug else kDatabaseNameDebug
+
+    databasePath = getDatabasePath(kAppName, databaseName)
     if self.db.openDatabase(databasePath):
       loadingTopicsSuccessful, topics = self.db.getTopics()
 
@@ -132,6 +136,9 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.trayIconMenu.addSeparator()
     self.trayIconMenu.addAction(self.ui.actionAbout_PostNote)
     self.trayIconMenu.addAction(self.ui.actionAbout_Qt)
+
+    if self.debug:
+      self.trayIconMenu.addAction(self.ui.actionDebug_Mode)
 
     self.trayIconMenu.addSeparator()
     self.trayIconMenu.addAction(self.ui.actionExit_PostNote)
@@ -366,6 +373,11 @@ class PostNoteWindow(QtWidgets.QMainWindow):
   @QtCore.Slot()
   def on_actionExit_PostNote_triggered(self):
     QtCore.QCoreApplication.quit()
+
+  @QtCore.Slot()
+  def on_actionDebug_Mode_triggered(self):
+    QtWidgets.QMessageBox.information(self, 'Debug Mode',
+                                    f"The application is running in debug mode.  The database is {kDatabaseNameDebug}.")
 
   def onAutoSaveTimerTimeout(self):
     """Idle timeout handler.  Used auto-save dirty notes.
