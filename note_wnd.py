@@ -1,5 +1,6 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from button_bar_widget import ButtonBarWidget
+from style_manager import StyleManager
 from text_edit import TextEdit
 from ui_note_wnd import Ui_NoteWnd
 from note_data import TOPIC_ID, NoteData, kInvalidNote
@@ -17,7 +18,7 @@ class NoteWnd(QtWidgets.QWidget):
   deleteNote = QtCore.Signal(int)
   showEditTopicDialog = QtCore.Signal(int)
 
-  def __init__(self, topicManager: TopicManager, parent: QtWidgets.QWidget = None):
+  def __init__(self, topicManager: TopicManager, styleManager: StyleManager, parent: QtWidgets.QWidget = None):
     super(NoteWnd, self).__init__(parent, QtCore.Qt.Tool | QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint)
 
     # The modificationAllowed flag prevents various changes to the note as being considered user modifications.  It will be
@@ -30,6 +31,7 @@ class NoteWnd(QtWidgets.QWidget):
     self.ui.setupUi(self)
 
     self.topicManager = topicManager
+    self.styleManager = styleManager
 
     self.noteId = kInvalidNote
     self.noteCreationTime = datetime.datetime.now()
@@ -42,6 +44,8 @@ class NoteWnd(QtWidgets.QWidget):
     self.noteStyle = NoteStyle()
 
     self.propertiesDlg = None
+
+    self.ui.textEdit.initialize(self.styleManager)
 
     self.setMinimumSize(QtCore.QSize(40, 20))
     self.updateNote()

@@ -58,6 +58,11 @@ def getPrefsPath(applicationName: str, prefsFileName: str) -> str:
   dataDirectory = getStorageDirectory(applicationName)
   return os.path.join(dataDirectory, prefsFileName)
 
+def getStyleDefsPath(applicationName: str, styleDefsFileName: str) -> str:
+  """ Returns the full path to the style definitions file. """
+  dataDirectory = getStorageDirectory(applicationName)
+  return os.path.join(dataDirectory, styleDefsFileName)
+
 def copyQRect(src: QtCore.QRect) -> QtCore.QRect:
   """Makes a deep copy of a QRect.  Simply assigning one QRect to another one will not perform a
      copy; it will simply assign a reference, so that both rects point to the same QRect.

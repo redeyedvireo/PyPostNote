@@ -3,6 +3,7 @@ from note_data import TOPIC_ID, NoteData, NOTE_ID, ENoteSizeEnum
 from note_exporter import NoteExporter
 from note_wnd import NoteWnd
 from preferences import Preferences
+from style_manager import StyleManager
 from topic import Topic, kDefaultTopicId
 from topic_manager import TopicManager
 import logging
@@ -19,11 +20,12 @@ NoteSizeList= [
 class NoteManager(QtCore.QObject):
   saveNote = QtCore.Signal(NoteData)
 
-  def __init__(self, topicManager: TopicManager, preferences: Preferences):
+  def __init__(self, topicManager: TopicManager, styleManager: StyleManager, preferences: Preferences):
     super().__init__()
 
     self.noteWndDict: dict[NOTE_ID, NoteWnd] = {}     # Maps NOTE_IDs to NoteWnds
     self.topicManager = topicManager
+    self.styleManager = styleManager
     self.preferences = preferences
 
     self.defaultNoteFontSize = self.preferences.defaultFontSize
@@ -124,7 +126,7 @@ class NoteManager(QtCore.QObject):
         # Generate a new ID
         noteId = self.getFreeId()
 
-    noteWnd = NoteWnd(self.topicManager)
+    noteWnd = NoteWnd(self.topicManager, self.styleManager)
     noteWnd.noteId = noteId
 
     noteWnd.setDefaultFont(self.defaultNoteFontFamily, self.defaultNoteFontSize)

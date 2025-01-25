@@ -1,6 +1,7 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 
 from edit_toolbar import EditToolbar
+from style_manager import StyleManager
 
 class TextEdit(QtWidgets.QTextEdit):
   TE_GainedFocus = QtCore.Signal()
@@ -15,6 +16,9 @@ class TextEdit(QtWidgets.QTextEdit):
 
     self.selectionChanged.connect(self.on_selectionChanged)
     self.cursorPositionChanged.connect(self.on_cursorPositionChanged)
+
+  def initialize(self, styleManager: StyleManager):
+    self.styleManager = styleManager
 
   def setDefaultFont(self, fontFamily: str, fontSize: int):
     if fontSize < 3 or len(fontFamily) == 0:
@@ -42,6 +46,16 @@ class TextEdit(QtWidgets.QTextEdit):
 
       menu.addMenu(formatMenu)
 
+      # Style submenu
+      menu.addSeparator()
+
+      styleMenu = QtWidgets.QMenu()
+
+      styleMenu.setTitle('Style')
+      self.populateStyleMenu(styleMenu)
+
+      menu.addMenu(styleMenu)
+
     menu.addSeparator()
 
     if self.hasBeenClicked:
@@ -53,6 +67,13 @@ class TextEdit(QtWidgets.QTextEdit):
     menu.addAction('Entire Note to Default Font', self.onToDefaultFontTriggered)
 
     menu.exec_(event.globalPos())
+
+  def populateStyleMenu(self, styleMenu: QtWidgets.QMenu):
+    styleMenu.clear()
+    styleIdsAndNames = self.styleManager.getStyleIdsAndNames()
+
+    for styleId, styleName in styleIdsAndNames:
+      styleMenu.addAction(styleName, lambda: self.styleManager.applyStyle(self, styleId))
 
   def focusInEvent(self, event: QtGui.QFocusEvent):
     super(TextEdit, self).focusInEvent(event)

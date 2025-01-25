@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="PostNote">
+    <file>Resources/minus.png</file>
+    <file>Resources/pencil.png</file>
+    <file>Resources/plus.png</file>
     <file>Resources/properties.png</file>
     <file>Resources/eye.png</file>
     <file>Resources/Horiz Line.png</file>

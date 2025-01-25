@@ -5,16 +5,17 @@ from note_data import TOPIC_ID, NoteData, ENoteSizeEnum
 from note_exporter import NoteExporter
 from note_importer import NoteImporter
 from note_manager import NoteManager
-from note_style import ENoteBackground
 from note_wnd import NoteWnd
 from preferences import Preferences, EDoubleClickAction
 from preferences_dlg import PreferencesDlg
 from quick_create_dlg import QuickCreateDlg
+from select_style_dlg import SelectStyleDialog
+from style_manager import StyleManager
 from topic import Topic
 from topic_manager import TopicManager
 from ui_postnote import Ui_PostNoteClass
 from edit_topics_dialog import EditTopicsDialog
-from util import getDatabasePath, getPrefsPath, getStorageDirectory
+from util import getDatabasePath, getPrefsPath, getStorageDirectory, getStyleDefsPath
 import logging
 
 
@@ -22,9 +23,10 @@ kAppName = 'PyPostNote'
 kDatabaseName = 'Notes.db'
 kDatabaseNameDebug = 'NotesDebug.db'
 kPrefsName = 'PyPostNote.ini'
+kStyleDefsName = 'Styles.xml'
 
 class PostNoteWindow(QtWidgets.QMainWindow):
-  def __init__(self, db: Database, noteManager: NoteManager, topicManager: TopicManager, preferences: Preferences, debug: bool):
+  def __init__(self, db: Database, noteManager: NoteManager, topicManager: TopicManager, styleManager: StyleManager, preferences: Preferences, debug: bool):
     super(PostNoteWindow, self).__init__()
 
     self.ui = Ui_PostNoteClass()
@@ -34,6 +36,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
     self.noteManager = noteManager
     self.topicManager = topicManager
+    self.styleManager = styleManager
     self.db = db
     self.preferences = preferences
 
@@ -53,6 +56,10 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     preferencesPath = getPrefsPath(kAppName, kPrefsName)
 
     self.preferences.readPrefsFile(preferencesPath)
+
+    # Load the style definitions
+    styleDefsPath = getStyleDefsPath(kAppName, kStyleDefsName)
+    self.styleManager.loadStyleDefs(styleDefsPath)
 
     databaseName = kDatabaseName if not self.debug else kDatabaseNameDebug
 
@@ -119,19 +126,24 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
     self.trayIconMenu.addMenu(self.noteSizeMenu)
 
-    self.trayIconMenu.addAction(self.ui.actionSave_All_Notes)
-    self.trayIconMenu.addAction(self.ui.actionHide_All_Notes)
-    self.trayIconMenu.addAction(self.ui.actionShow_All_Notes)
-
     # Create note list menu
     self.noteListMenu = QtWidgets.QMenu('Show Note', self)
     self.trayIconMenu.addMenu(self.noteListMenu)
 
-    self.trayIconMenu.addAction(self.ui.actionImport_Notes)
-    self.trayIconMenu.addAction(self.ui.actionExport_Notes)
+    self.trayIconMenu.addSeparator()
+    self.trayIconMenu.addAction(self.ui.actionSave_All_Notes)
+    self.trayIconMenu.addAction(self.ui.actionHide_All_Notes)
+    self.trayIconMenu.addAction(self.ui.actionShow_All_Notes)
+
+
+    self.trayIconMenu.addSeparator()
     self.trayIconMenu.addAction(self.ui.actionEdit_Topics)
+    self.trayIconMenu.addAction(self.ui.actionEdit_Styles)
     self.trayIconMenu.addAction(self.ui.actionPreferences)
 
+    self.trayIconMenu.addSeparator()
+    self.trayIconMenu.addAction(self.ui.actionImport_Notes)
+    self.trayIconMenu.addAction(self.ui.actionExport_Notes)
 
     self.trayIconMenu.addSeparator()
     self.trayIconMenu.addAction(self.ui.actionAbout_PostNote)
@@ -336,13 +348,22 @@ class PostNoteWindow(QtWidgets.QMainWindow):
   @QtCore.Slot()
   def on_actionEdit_Topics_triggered(self):
     dlg = EditTopicsDialog(self, self.topicManager, self.noteManager)
-    dlg.exec_()
+    dlg.exec()
+
+  @QtCore.Slot()
+  def on_actionEdit_Styles_triggered(self):
+    dlg = SelectStyleDialog(self, self.styleManager)
+    dlg.exec()
+
+    # Save style defs
+    styleDefsPath = getStyleDefsPath(kAppName, kStyleDefsName)
+    self.styleManager.saveStyleDefs(styleDefsPath)
 
   @QtCore.Slot()
   def on_actionPreferences_triggered(self):
     dlg = PreferencesDlg(self.noteManager, self.preferences, self)
 
-    dlg.exec_()
+    dlg.exec()
 
     self.updateAutoShutdown()
 

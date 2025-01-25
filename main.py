@@ -4,6 +4,7 @@ import os.path
 import logging
 from logging.handlers import RotatingFileHandler
 from preferences import Preferences
+from style_manager import StyleManager
 from util import getScriptPath
 from postnote import PostNoteWindow
 from database import Database
@@ -41,8 +42,9 @@ def main(debug: bool):
   preferences = Preferences()
   database = Database()
   topicManager = TopicManager()
-  noteManager = NoteManager(topicManager, preferences)
-  window = PostNoteWindow(database, noteManager, topicManager, preferences, debug)
+  styleManager = StyleManager()
+  noteManager = NoteManager(topicManager, styleManager, preferences)
+  window = PostNoteWindow(database, noteManager, topicManager, styleManager, preferences, debug)
 
   window.initialize()
 

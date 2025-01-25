@@ -10,3 +10,5 @@ pyside6-uic note_properties_dlg.ui -o ui_note_properties_dlg.py
 pyside6-uic edit_note_color_scheme_dlg.ui -o ui_edit_note_color_scheme_dlg.py
 pyside6-uic quick_create_dlg.ui -o ui_quick_create_dlg.py
 pyside6-uic about_dlg.ui -o ui_about_dlg.py
+pyside6-uic style_dlg.ui -o ui_style_dlg.py
+pyside6-uic select_style_dlg.ui -o ui_select_style_dlg.py
