@@ -73,7 +73,9 @@ class TextEdit(QtWidgets.QTextEdit):
     styleIdsAndNames = self.styleManager.getStyleIdsAndNames()
 
     for styleId, styleName in styleIdsAndNames:
-      styleMenu.addAction(styleName, lambda: self.styleManager.applyStyle(self, styleId))
+      # Note: using lambda functions in loops is tricky.  For more details, see:
+      # https://www.pythonguis.com/tutorials/pyside6-transmitting-extra-data-qt-signals/
+      styleMenu.addAction(styleName, lambda sId=styleId: self.styleManager.applyStyle(self, sId))
 
   def focusInEvent(self, event: QtGui.QFocusEvent):
     super(TextEdit, self).focusInEvent(event)
