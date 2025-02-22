@@ -71,7 +71,7 @@ class ButtonBarWidget(QtWidgets.QWidget):
 
     barSize = copyQSize(self.initialSize)
 
-    kBorder = 5
+    kBorder = 0
 
     self.grownButtonBarRect = copyQRect(textEditRect)
 
