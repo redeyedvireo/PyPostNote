@@ -352,7 +352,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot()
   def on_actionEdit_Styles_triggered(self):
-    dlg = SelectStyleDialog(self, self.styleManager)
+    dlg = SelectStyleDialog(self, self.styleManager, self.preferences.defaultFontFamily, self.preferences.defaultFontSize)
     dlg.exec()
 
     # Save style defs
