@@ -19,7 +19,7 @@ class EditToolbar(QtWidgets.QWidget):
   tableTriggered = QtCore.Signal(int, int)      # Number of rows, number of columns
 
   def __init__(self, parent: QtWidgets.QWidget):
-    super(EditToolbar, self).__init__(parent, QtCore.Qt.Tool | QtCore.Qt.MSWindowsFixedSizeDialogHint)
+    super(EditToolbar, self).__init__(parent, QtCore.Qt.WindowType.Tool | QtCore.Qt.WindowType.MSWindowsFixedSizeDialogHint)
 
     self.ui = Ui_EditToolbar()
     self.ui.setupUi(self)
@@ -69,7 +69,7 @@ class EditToolbar(QtWidgets.QWidget):
   def setFontCombos(self, textCursor: QtGui.QTextCursor):
     charFormat = textCursor.charFormat()
     self.setFontFamily(charFormat.fontFamily())
-    self.setFontSize(charFormat.fontPointSize())
+    self.setFontSize(round(charFormat.fontPointSize()))
 
   def setFontFamily(self, family: str):
     if len(family) > 0:

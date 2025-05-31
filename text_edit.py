@@ -28,7 +28,7 @@ class TextEdit(QtWidgets.QTextEdit):
 
     self.document().setDefaultFont(tempFont)
 
-  def contextMenuEvent(self, event: QtGui.QContextMenuEvent):
+  def contextMenuEvent(self, e: QtGui.QContextMenuEvent):
     # super().contextMenuEvent(event)
 
     menu = self.createStandardContextMenu()
@@ -66,7 +66,7 @@ class TextEdit(QtWidgets.QTextEdit):
 
     menu.addAction('Entire Note to Default Font', self.onToDefaultFontTriggered)
 
-    menu.exec_(event.globalPos())
+    menu.exec_(e.globalPos())
 
   def populateStyleMenu(self, styleMenu: QtWidgets.QMenu):
     styleMenu.clear()
@@ -77,14 +77,14 @@ class TextEdit(QtWidgets.QTextEdit):
       # https://www.pythonguis.com/tutorials/pyside6-transmitting-extra-data-qt-signals/
       styleMenu.addAction(styleName, lambda sId=styleId: self.styleManager.applyStyle(self, sId))
 
-  def focusInEvent(self, event: QtGui.QFocusEvent):
-    super(TextEdit, self).focusInEvent(event)
+  def focusInEvent(self, e: QtGui.QFocusEvent):
+    super(TextEdit, self).focusInEvent(e)
 
     self.updateFontControls()
     self.TE_GainedFocus.emit()
 
-  def focusOutEvent(self, event: QtGui.QFocusEvent):
-    super(TextEdit, self).focusOutEvent(event)
+  def focusOutEvent(self, e: QtGui.QFocusEvent):
+    super(TextEdit, self).focusOutEvent(e)
 
     self.TE_LostFocus.emit()
 
@@ -121,7 +121,7 @@ class TextEdit(QtWidgets.QTextEdit):
     self.editToolbar.setFontFamily(fontFamily)
 
     fontSize = selectionFormat.fontPointSize()
-    self.editToolbar.setFontSize(fontSize)
+    self.editToolbar.setFontSize(round(fontSize))
 
   def getFontSizeOfSelection(self):
     selectionCursor, selectionFormat = self.getCursorAndSelectionFormat()
@@ -149,7 +149,7 @@ class TextEdit(QtWidgets.QTextEdit):
     return (self.textCursor(), QtGui.QTextListFormat())
 
   def onEditToolbarTriggered(self):
-    self.editToolbar = EditToolbar(self.parent())
+    self.editToolbar = EditToolbar(self.theParent)
 
     self.editToolbar.toolbarClosing.connect(self.onToolbarClosing)
     self.editToolbar.fontSizeChanged.connect(self.onFontSizeChanged)
@@ -227,7 +227,8 @@ class TextEdit(QtWidgets.QTextEdit):
 
     # Update font size combo
     fontSize = self.getFontSizeOfSelection()
-    self.editToolbar.setFontSize(fontSize)
+    if self.editToolbar is not None:
+      self.editToolbar.setFontSize(round(fontSize))
 
   def onLeftAlignTriggered(self):
     selectionCursor, selectionFormat = self.getCursorAndBlockFormat()
