@@ -81,8 +81,9 @@ class PostNoteWindow(QtWidgets.QMainWindow):
         # Create the note windows
         for note in notes:
           noteWnd = self.noteManager.createPopulatedNote(note)
-          # Connect to any signals the note might have, such as a signal to launch the topics editor.
-          self.connectNoteSignals(noteWnd)
+          if noteWnd is not None:
+            # Connect to any signals the note might have, such as a signal to launch the topics editor.
+            self.connectNoteSignals(noteWnd)
 
         # Start the auto-save timer
         self.autoSaveTimer.start(1000 * 60 * self.preferences.autoSaveMinutes)
@@ -125,16 +126,14 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.noteSizeMenu.addAction(self.ui.actionExtra_Large)
 
     self.trayIconMenu.addMenu(self.noteSizeMenu)
+    self.trayIconMenu.addSeparator()
+
+    self.trayIconMenu.addAction(self.ui.actionHide_All_Notes)
+    self.trayIconMenu.addAction(self.ui.actionShow_All_Notes)
 
     # Create note list menu
     self.noteListMenu = QtWidgets.QMenu('Show Note', self)
     self.trayIconMenu.addMenu(self.noteListMenu)
-
-    self.trayIconMenu.addSeparator()
-    self.trayIconMenu.addAction(self.ui.actionSave_All_Notes)
-    self.trayIconMenu.addAction(self.ui.actionHide_All_Notes)
-    self.trayIconMenu.addAction(self.ui.actionShow_All_Notes)
-
 
     self.trayIconMenu.addSeparator()
     self.trayIconMenu.addAction(self.ui.actionEdit_Topics)
@@ -142,6 +141,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.trayIconMenu.addAction(self.ui.actionPreferences)
 
     self.trayIconMenu.addSeparator()
+    self.trayIconMenu.addAction(self.ui.actionSave_All_Notes)
     self.trayIconMenu.addAction(self.ui.actionImport_Notes)
     self.trayIconMenu.addAction(self.ui.actionExport_Notes)
 
@@ -160,15 +160,17 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   def createNewNote(self, sizeEnum: ENoteSizeEnum):
     noteWnd = self.noteManager.createBlankNote(sizeEnum)
-    success = self.db.addNote(noteWnd.noteData)
 
-    if success:
-      # Connect to any signals the note might have, such as a signal to launch the topics editor.
-      self.connectNoteSignals(noteWnd)
-      return noteWnd
-    else:
-      logging.error(f'[PostNoteWindow.createNewNote] Error creating a note of size {sizeEnum}')
-      return None
+    if noteWnd is not None:
+      success = self.db.addNote(noteWnd.noteData)
+
+      if success:
+        # Connect to any signals the note might have, such as a signal to launch the topics editor.
+        self.connectNoteSignals(noteWnd)
+        return noteWnd
+      else:
+        logging.error(f'[PostNoteWindow.createNewNote] Error creating a note of size {sizeEnum}')
+        return None
 
 
   # ************ SLOTS ************
@@ -293,10 +295,8 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot()
   def on_actionImport_Notes_triggered(self):
-    options = QtWidgets.QFileDialog.Options()
     fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Import Notes", "",
-                                                        "JSON Files (*.json);;All Files (*)",
-                                                        options=options)
+                                                        "JSON Files (*.json);;All Files (*)")
 
     if fileName is not None:
       noteImporter = NoteImporter()
@@ -334,10 +334,8 @@ class PostNoteWindow(QtWidgets.QMainWindow):
 
   @QtCore.Slot()
   def on_actionExport_Notes_triggered(self):
-    options = QtWidgets.QFileDialog.Options()
     fileName, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Export Notes", "",
-                                                        "JSON Files (*.json);;All Files (*)",
-                                                        options=options)
+                                                        "JSON Files (*.json);;All Files (*)")
 
     if fileName is not None:
       noteExporter = NoteExporter()

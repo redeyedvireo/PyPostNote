@@ -104,7 +104,7 @@ class NoteManager(QtCore.QObject):
       if noteWnd.topicId == topicId:
         noteWnd.topicId = kDefaultTopicId
 
-  def createNote(self, noteId: NOTE_ID, useNewId = False) -> NoteWnd:
+  def createNote(self, noteId: NOTE_ID, useNewId = False):
     """Creates a new note with the given ID.  If useNewId is True, a new ID will be generated
        if the given ID is already in use.
 
@@ -249,15 +249,16 @@ class NoteManager(QtCore.QObject):
     if noteWasMoved:
       logging.info(f'[NoteManager.fixNotePosition] Note {noteWnd.noteId} was moved to {noteWnd.x()}, {noteWnd.y()}')
 
-  def createBlankNote(self, noteSize: ENoteSizeEnum) -> NoteWnd:
+  def createBlankNote(self, noteSize: ENoteSizeEnum):
     noteId = self.getFreeId()
 
     newNote = self.createNote(noteId)
 
-    noteSizeTuple = NoteSizeList[noteSize.value]
+    if newNote is not None:
+      noteSizeTuple = NoteSizeList[noteSize.value]
 
-    newNote.resize(QtCore.QSize(noteSizeTuple[0], noteSizeTuple[1]))
-    newNote.showNote()
+      newNote.resize(QtCore.QSize(noteSizeTuple[0], noteSizeTuple[1]))
+      newNote.showNote()
 
     return newNote
 
