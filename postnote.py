@@ -1,7 +1,7 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from about_dlg import AboutDlg
 from database import Database
-from note_data import TOPIC_ID, NoteData, ENoteSizeEnum
+from note_data import TOPIC_ID, NoteData, FavoriteNoteData, ENoteSizeEnum
 from note_exporter import NoteExporter
 from note_importer import NoteImporter
 from note_manager import NoteManager
@@ -78,12 +78,16 @@ class PostNoteWindow(QtWidgets.QMainWindow):
       loadingNotesSuccessful, notes = self.db.getNotes()
 
       if loadingNotesSuccessful:
-        # Create the note windows
+        # Create the note windows.
         for note in notes:
-          noteWnd = self.noteManager.createPopulatedNote(note)
-          if noteWnd is not None:
-            # Connect to any signals the note might have, such as a signal to launch the topics editor.
-            self.connectNoteSignals(noteWnd)
+          if note.isFavoriteNote:
+            self.noteManager.addNoteToFavorites(note.noteId, FavoriteNoteData(note.noteId, note.title))
+          else:
+            noteWnd = self.noteManager.createPopulatedNote(note)
+
+            if noteWnd is not None:
+              # Connect to any signals the note might have, such as a signal to launch the topics editor.
+              self.connectNoteSignals(noteWnd)
 
         # Start the auto-save timer
         self.autoSaveTimer.start(1000 * 60 * self.preferences.autoSaveMinutes)
@@ -95,6 +99,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     noteWnd.saveNote.connect(self.onSaveNote)
     noteWnd.deleteNote.connect(self.onDeleteNote)
     noteWnd.showEditTopicDialog.connect(self.onEditTopicsTriggeredFromNote)
+    noteWnd.addNoteToNoteFavorites.connect(self.onAddNoteToNoteFavorites)
 
   def updateAutoShutdown(self):
     # TODO: Implement
@@ -125,7 +130,13 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.noteSizeMenu.addAction(self.ui.actionLarge)
     self.noteSizeMenu.addAction(self.ui.actionExtra_Large)
 
+
     self.trayIconMenu.addMenu(self.noteSizeMenu)
+
+    # Create Favorite Notes menu
+    self.favoriteNotesMenu = QtWidgets.QMenu('Favorite Notes', self)
+    self.trayIconMenu.addMenu(self.favoriteNotesMenu)
+
     self.trayIconMenu.addSeparator()
 
     self.trayIconMenu.addAction(self.ui.actionHide_All_Notes)
@@ -199,7 +210,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
       # The tray icon was right-clicked
       self.noteListMenu.clear()
 
-      ids = self.noteManager.allNoteIds()
+      ids = self.noteManager.allDisplayableNoteIds()
 
       for id in ids:
         note = self.noteManager.getNote(id)
@@ -208,6 +219,14 @@ class PostNoteWindow(QtWidgets.QMainWindow):
           title = note.noteTitle
           action = self.noteListMenu.addAction(title, self.onShowNote)
           action.setData(id)
+
+        self.favoriteNotesMenu.clear()
+        favoriteIds = self.noteManager.allFavoriteNoteIds()
+        for favoriteId in favoriteIds:
+          favoriteNoteData = self.noteManager.getFavoriteNoteData(favoriteId)
+          if favoriteNoteData is not None:
+            favoriteAction = self.favoriteNotesMenu.addAction(favoriteNoteData.title, self.onCreateNoteFromFavorite)
+            favoriteAction.setData(favoriteId)
 
     elif reason == QtWidgets.QSystemTrayIcon.ActivationReason.DoubleClick:
       # The tray icon was double-clicked
@@ -250,6 +269,58 @@ class PostNoteWindow(QtWidgets.QMainWindow):
       if noteWnd is not None:
         noteWnd.noteTitle = noteTitle
         noteWnd.topicId = noteTopicId
+
+  def onAddNoteToNoteFavorites(self, noteId: int):
+    """Adds a note to the list of favorite notes.
+
+    Args:
+        noteId (int): The ID of the note to add to favorites.
+    """
+    noteWnd = self.noteManager.getNote(noteId)
+
+    if noteWnd is not None:
+      freeId = self.noteManager.getFreeId()     # The note must have a unique ID
+      if freeId is None:
+        logging.error('[PostNoteWindow.onAddNoteToNoteFavorites] No free note ID found in the database.')
+        QtWidgets.QMessageBox.critical(self,
+                              "Add note to favorites",
+                              "An error occurred when adding this note to the note favorites.")
+        return
+
+      noteData = noteWnd.noteData
+      noteData.isFavoriteNote = True
+      noteData.noteId = freeId
+      favoriteNoteData = FavoriteNoteData(freeId, noteWnd.noteTitle)
+      self.noteManager.addNoteToFavorites(freeId, favoriteNoteData)
+
+      result = self.db.addNote(noteData)
+
+      if not result:
+        logging.error(f'Error adding note "{noteWnd.noteTitle}" (ID: {noteId}) to favorites.')
+        QtWidgets.QMessageBox.critical(self,
+                              "Add note to favorites",
+                              "An error occurred when adding this note to the note favorites.")
+
+  def onCreateNoteFromFavorite(self):
+    sender = self.sender()
+
+    if type(sender) is QtGui.QAction:
+      noteId = sender.data()
+      favoriteNoteData = self.db.getNote(noteId)
+
+      if favoriteNoteData is not None:
+        noteWnd = self.noteManager.createPopulatedNote(favoriteNoteData, True)
+
+        if noteWnd is not None:
+          # Connect to any signals the note might have, such as a signal to launch the topics editor.
+          self.connectNoteSignals(noteWnd)
+
+          success = self.db.addNote(noteWnd.noteData)
+          if not success:
+            logging.error(f'Error creating note from favorite note {favoriteNoteData.title} (ID: {noteId})')
+            QtWidgets.QMessageBox.critical(self,
+                              "Create note from favorite",
+                              "An error occurred when creating a note from the favorite note.")
 
   @QtCore.Slot()
   def onShowNote(self):

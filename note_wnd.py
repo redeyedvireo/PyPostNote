@@ -17,6 +17,7 @@ class NoteWnd(QtWidgets.QWidget):
   saveNote = QtCore.Signal(NoteData)
   deleteNote = QtCore.Signal(int)
   showEditTopicDialog = QtCore.Signal(int)
+  addNoteToNoteFavorites = QtCore.Signal(int)     # The parameter is the note ID
 
   def __init__(self, topicManager: TopicManager, styleManager: StyleManager, parent: QtWidgets.QWidget = None):
     super(NoteWnd, self).__init__(parent, QtCore.Qt.Tool | QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint)
@@ -74,6 +75,8 @@ class NoteWnd(QtWidgets.QWidget):
     outNoteData.bgType = self.noteStyle.backgroundType
     outNoteData.transparency = self.noteStyle.transparency
 
+    # Note: include the isFavoriteNote flag.  That flag doesn't exist in a NoteWnd.
+
     return outNoteData
 
   @noteData.setter
@@ -95,6 +98,8 @@ class NoteWnd(QtWidgets.QWidget):
     self.noteStyle.backgroundColor = data.bgColor
     self.noteStyle.backgroundType = data.bgType
     self.noteStyle.transparency = data.transparency
+
+    # Note: don't set the isFavoriteNote.  That flag doesn't exist in a NoteWnd.
 
     self.updateNote()
 
@@ -311,6 +316,11 @@ class NoteWnd(QtWidgets.QWidget):
 
   def onDeleteNote(self):
     self.deleteNote.emit(self.noteId)
+
+  @QtCore.Slot()
+  def on_textEdit_TE_AddToNoteFavorites(self):
+    """ Adds the current note to the list of favorite notes. """
+    self.addNoteToNoteFavorites.emit(self.noteId)
 
   @QtCore.Slot()
   def on_textEdit_textChanged(self):

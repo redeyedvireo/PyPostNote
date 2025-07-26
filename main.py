@@ -43,7 +43,7 @@ def main(debug: bool):
   database = Database()
   topicManager = TopicManager()
   styleManager = StyleManager()
-  noteManager = NoteManager(topicManager, styleManager, preferences)
+  noteManager = NoteManager(database, topicManager, styleManager, preferences)
   window = PostNoteWindow(database, noteManager, topicManager, styleManager, preferences, debug)
 
   window.initialize()

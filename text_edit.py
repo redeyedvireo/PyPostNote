@@ -6,6 +6,7 @@ from style_manager import StyleManager
 class TextEdit(QtWidgets.QTextEdit):
   TE_GainedFocus = QtCore.Signal()
   TE_LostFocus = QtCore.Signal()
+  TE_AddToNoteFavorites = QtCore.Signal()    # Signal emitted when a note is added to favorites
 
   def __init__(self, parent):
     super(TextEdit, self).__init__(parent)
@@ -65,6 +66,8 @@ class TextEdit(QtWidgets.QTextEdit):
       menu.addAction('Edit Toolbar', self.onEditToolbarTriggered)
 
     menu.addAction('Entire Note to Default Font', self.onToDefaultFontTriggered)
+
+    menu.addAction('Add to Favorite Notes', self.sendAddToFavoriteNotesSignal)
 
     menu.exec_(e.globalPos())
 
@@ -303,3 +306,8 @@ class TextEdit(QtWidgets.QTextEdit):
     selectionCursor = self.textCursor()
     selectionCursor.insertTable(numRows, numColumns)
     self.theParent.setFocus(QtCore.Qt.FocusReason.MouseFocusReason)
+
+  def sendAddToFavoriteNotesSignal(self):
+    """Sends a signal to the parent to add the current note to favorites.
+    """
+    self.TE_AddToNoteFavorites.emit()

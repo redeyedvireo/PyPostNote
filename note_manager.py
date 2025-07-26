@@ -1,5 +1,6 @@
 from PySide6 import QtCore, QtWidgets, QtGui
-from note_data import TOPIC_ID, NoteData, NOTE_ID, ENoteSizeEnum
+from database import Database
+from note_data import TOPIC_ID, NoteData, FavoriteNoteData, NOTE_ID, ENoteSizeEnum
 from note_exporter import NoteExporter
 from note_wnd import NoteWnd
 from preferences import Preferences
@@ -20,10 +21,12 @@ NoteSizeList= [
 class NoteManager(QtCore.QObject):
   saveNote = QtCore.Signal(NoteData)
 
-  def __init__(self, topicManager: TopicManager, styleManager: StyleManager, preferences: Preferences):
+  def __init__(self, db: Database, topicManager: TopicManager, styleManager: StyleManager, preferences: Preferences):
     super().__init__()
 
     self.noteWndDict: dict[NOTE_ID, NoteWnd] = {}     # Maps NOTE_IDs to NoteWnds
+    self.favoriteNoteData: dict[NOTE_ID, FavoriteNoteData] = {}  # Maps NOTE_IDs to FavoriteNoteData
+    self.db = db
     self.topicManager = topicManager
     self.styleManager = styleManager
     self.preferences = preferences
@@ -46,16 +49,28 @@ class NoteManager(QtCore.QObject):
   def defaultNoteFontSize(self, size: int):
     self.preferences.defaultFontSize = size
 
-  def allNoteIds(self) -> list[NOTE_ID]:
-    """Returns a list of all note IDs
+  def allDisplayableNoteIds(self) -> list[NOTE_ID]:
+    """Returns a list of all displayable note IDs.  This does not include
+       favorite notes.
 
     Returns:
         list[NOTE_ID]: List of note IDs
     """
-    return self.noteWndDict.keys()
+    return list(self.noteWndDict.keys())
+
+  def allFavoriteNoteIds(self) -> list[NOTE_ID]:
+    """Returns a list of all favorite note IDs.
+
+    Returns:
+        list[NOTE_ID]: List of favorite note IDs
+    """
+    return list(self.favoriteNoteData.keys())
 
   def getNote(self, noteId: NOTE_ID) -> NoteWnd | None:
     return self.noteWndDict[noteId] if noteId in self.noteWndDict else None
+
+  def getFavoriteNoteData(self, noteId: NOTE_ID) -> FavoriteNoteData | None:
+    return self.favoriteNoteData[noteId] if noteId in self.favoriteNoteData else None
 
   def showNote(self, noteId: NOTE_ID):
     if noteId in self.noteWndDict:
@@ -104,8 +119,17 @@ class NoteManager(QtCore.QObject):
       if noteWnd.topicId == topicId:
         noteWnd.topicId = kDefaultTopicId
 
+  def addNoteToFavorites(self, noteId: NOTE_ID, noteFavoriteData: FavoriteNoteData):
+    """Adds the note with the given ID to the list of favorite notes.
+
+    Args:
+        noteId (NOTE_ID): ID of the note to add to favorites
+    """
+    if noteId not in self.favoriteNoteData:
+      self.favoriteNoteData[noteId] = noteFavoriteData
+
   def createNote(self, noteId: NOTE_ID, useNewId = False):
-    """Creates a new note with the given ID.  If useNewId is True, a new ID will be generated
+    """Creates a new note with the given ID.  If useNewId is True, a new ID will be generated.
        if the given ID is already in use.
 
     Args:
@@ -116,6 +140,12 @@ class NoteManager(QtCore.QObject):
     Returns:
         NoteWnd: Created note window, or None if the note ID is already in use
     """
+    if useNewId:
+      # If useNewId is True, generate a new ID
+      noteId = self.getFreeId()
+      if noteId is None:
+        return None
+
     # First, check that noteId is not already being used
     if noteId in self.noteWndDict:
       if not useNewId:
@@ -125,6 +155,8 @@ class NoteManager(QtCore.QObject):
       else:
         # Generate a new ID
         noteId = self.getFreeId()
+        if noteId is None:
+          return None
 
     noteWnd = NoteWnd(self.topicManager, self.styleManager)
     noteWnd.noteId = noteId
@@ -251,6 +283,9 @@ class NoteManager(QtCore.QObject):
 
   def createBlankNote(self, noteSize: ENoteSizeEnum):
     noteId = self.getFreeId()
+    if noteId is None:
+      logging.error('[NoteManager.createBlankNote] No free note ID found in the database.')
+      return None
 
     newNote = self.createNote(noteId)
 
@@ -291,14 +326,16 @@ class NoteManager(QtCore.QObject):
       noteWnd = self.noteWndDict[noteId]
       noteWnd.updateTopics()
 
-  def getFreeId(self, addToDatabase = False):
+  def getFreeId(self):
     """Returns the next free ID to use when creating a new note.
     """
-    keysInUse = self.noteWndDict.keys()
+    freeId = self.db.getFreeNoteId()
 
-    highestKey = max(keysInUse) if len(keysInUse) > 0 else 0
+    if freeId is None:
+      # If the database returns None, then there are no notes in the database.
+      logging.error('[NoteManager.getFreeId] No free note ID found in the database.')
 
-    return highestKey + 1
+    return freeId
 
   def addNotesToExporter(self, noteExporter: NoteExporter):
     for noteWnd in self.noteWndDict.values():

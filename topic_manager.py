@@ -131,7 +131,7 @@ class TopicManager(QtCore.QObject):
     if updateDatabase:
       self.topicDeleted.emit(topicId)
 
-  def getFreeId(self, addToDatabase = False):
+  def getFreeId(self):
     """Returns the next free ID to use when creating a new topic.
     """
     keysInUse = self.topicMap.keys()

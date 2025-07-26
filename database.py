@@ -9,7 +9,8 @@ import datetime
 import logging
 
 # In version 2, the note's position and size was explicitly stored.
-kCurrentDatabaseVersion = 2
+# In version 3, the isFavoriteNote field was added to the notes table.
+kCurrentDatabaseVersion = 3
 
 # Global value data type constants
 kDataTypeInteger = 0
@@ -91,6 +92,11 @@ class Database:
       if not success:
         self.reportError("Error when attempting to update the database to version 2")
 
+    if databaseVersion == 2:
+      success = self.updateDatabaseToVersion3()
+      if not success:
+        self.reportError("Error when attempting to update the database to version 3")
+
   def updateDatabaseToVersion2(self):
     """ Updates the database to version 2. """
     self.setGlobalValue("databaseVersion", 2)
@@ -102,6 +108,15 @@ class Database:
     resultHeight = self.addColumnToTable("notes", "height", "integer")
 
     return resultX and resultY and resultWidth and resultHeight
+
+  def updateDatabaseToVersion3(self):
+    """ Updates the database to version 3. """
+    self.setGlobalValue("databaseVersion", 3)
+
+    # Add the isFavoriteNote field to the notes table
+    result = self.addColumnToTable("notes", "isFavoriteNote", "integer", defaultValue=0)
+
+    return result
 
   def addColumnToTable(self, tableName: str, columnName: str, columnType: str, defaultValue = None) -> bool:
     """ Adds a column to a table. """
@@ -148,6 +163,7 @@ class Database:
             y integer,
             width integer,
             height integer
+            isFavoriteNote integer DEFAULT 0
             )"""
 
     queryObj = QtSql.QSqlQuery()
@@ -385,8 +401,8 @@ class Database:
     queryObj = QtSql.QSqlQuery()
     queryObj.prepare("""insert into notes (noteid, title, notetext, geometry, added,
                      lastupdated, topicid, usesowncolors, alwaysontop,
-                     textcolor, bgcolor, bgtype, transparency)
-                     values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""")
+                     textcolor, bgcolor, bgtype, transparency, x, y, width, height, isFavoriteNote)
+                     values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""")
 
     queryObj.addBindValue(noteData.noteId)
     queryObj.addBindValue(noteData.title)
@@ -401,6 +417,11 @@ class Database:
     queryObj.addBindValue(noteData.bgColor.rgba())
     queryObj.addBindValue(noteData.bgType.value)
     queryObj.addBindValue(noteData.transparency)
+    queryObj.addBindValue(noteData.x)
+    queryObj.addBindValue(noteData.y)
+    queryObj.addBindValue(noteData.width)
+    queryObj.addBindValue(noteData.height)
+    queryObj.addBindValue(noteData.isFavoriteNote)
 
     queryObj.exec_()
 
@@ -425,7 +446,7 @@ class Database:
     queryObj = QtSql.QSqlQuery()
     queryObj.prepare("""update notes set title=?, notetext=?, geometry=?, added=?,
 		                          lastupdated=?, topicid=?, usesowncolors=?, alwaysontop=?, textcolor=?,
-                              bgcolor=?, bgtype=?, transparency=?, x=?, y=?, width=?, height=? where noteid=?""")
+                              bgcolor=?, bgtype=?, transparency=?, x=?, y=?, width=?, height=?, isFavoriteNote=? where noteid=?""")
 
     queryObj.addBindValue(noteData.title)
     queryObj.addBindValue(noteData.contentsData)
@@ -443,6 +464,7 @@ class Database:
     queryObj.addBindValue(noteData.y)
     queryObj.addBindValue(noteData.width)
     queryObj.addBindValue(noteData.height)
+    queryObj.addBindValue(noteData.isFavoriteNote)
     queryObj.addBindValue(noteData.noteId)
 
     queryObj.exec_()
@@ -488,7 +510,7 @@ class Database:
     queryObj = QtSql.QSqlQuery()
     queryObj.prepare("""select noteid, title, notetext, geometry, added,
                         lastupdated, topicid, usesowncolors, alwaysontop, textcolor, bgcolor, bgtype,
-                        transparency, x, y, width, height from notes""")
+                        transparency, x, y, width, height, isFavoriteNote from notes""")
 
     queryObj.exec_()
 
@@ -522,10 +544,62 @@ class Database:
       noteData.y = self.getQueryField(queryObj, 'y', None)
       noteData.width = self.getQueryField(queryObj, 'width', None)
       noteData.height = self.getQueryField(queryObj, 'height', None)
+      noteData.isFavoriteNote = True if self.getQueryField(queryObj, 'isFavoriteNote', 0) == 1 else False
 
       notes.append(noteData)
 
     return (True, notes)
+
+  def getNote(self, noteId: NOTE_ID) -> NoteData | None:
+    """ Retrieves a note from the database.
+
+    Args:
+        noteId (NOTE_ID): ID of the note to retrieve
+
+    Returns:
+        NoteData | None: NoteData if successful, None if not
+    """
+    queryObj = QtSql.QSqlQuery()
+    queryObj.prepare("select noteid, title, notetext, geometry, added, lastupdated, topicid, usesowncolors, "
+                     "alwaysontop, textcolor, bgcolor, bgtype, transparency, x, y, width, height, isFavoriteNote "
+                     "from notes where noteid=?")
+
+    queryObj.addBindValue(noteId)
+    queryObj.exec_()
+
+    # Check for errors
+    sqlErr = queryObj.lastError()
+
+    if sqlErr.type() != QtSql.QSqlError.ErrorType.NoError:
+      self.reportError(f'getNote error: {sqlErr.text()}')
+      return None
+
+    if queryObj.next():
+      noteData = NoteData()
+
+      noteData.noteId = self.getQueryField(queryObj, 'noteid', -1)
+      noteData.title = self.getQueryField(queryObj, 'title', '')
+      noteData.geometryData = self.getQueryField(queryObj, 'geometry', QtCore.QByteArray())
+      noteData.contentsData = self.getQueryField(queryObj, 'notetext', '')
+      noteData.addedTime = datetime.datetime.fromtimestamp(self.getQueryField(queryObj, 'added', 0))
+      noteData.lastModifiedTime = datetime.datetime.fromtimestamp(self.getQueryField(queryObj, 'lastupdated', 0))
+      noteData.topicId = self.getQueryField(queryObj, 'topicid', 0)
+      noteData.usesOwnColors = True if self.getQueryField(queryObj, 'usesowncolors', 0) == 1 else False
+      noteData.alwaysOnTop = True if self.getQueryField(queryObj, 'alwaysontop', 0) == 1 else False
+      noteData.textColor = QtGui.QColor.fromRgba(self.getQueryField(queryObj, 'textcolor', 0))
+      noteData.bgColor = QtGui.QColor.fromRgba(self.getQueryField(queryObj, 'bgcolor', 0))
+      noteData.bgType = ENoteBackground(self.getQueryField(queryObj, 'bgtype', 0))
+      noteData.transparency = self.getQueryField(queryObj, 'transparency', 100)
+      noteData.x = self.getQueryField(queryObj, 'x', None)
+      noteData.y = self.getQueryField(queryObj, 'y', None)
+      noteData.width = self.getQueryField(queryObj, 'width', None)
+      noteData.height = self.getQueryField(queryObj, 'height', None)
+      noteData.isFavoriteNote = True if self.getQueryField(queryObj, 'isFavoriteNote', 0) == 1 else False
+
+      return noteData
+    else:
+      # Note not found
+      return None
 
   def getTopics(self) -> tuple[bool, list[TopicData]]:
     """ Retrieves topics from the database.
@@ -639,3 +713,19 @@ class Database:
       return False
     else:
       return True
+
+  def getFreeNoteId(self):
+    """Returns the next free ID to use when creating a new note. """
+    maxId = 0
+
+    queryObj = QtSql.QSqlQuery(self.db)
+    queryObj.prepare("select max(noteid) from notes")
+    queryObj.exec_()
+
+    if queryObj.next():
+      maxId = max(maxId, queryObj.value(0) or 0)
+    else:
+      self.reportError("Error when attempting to retrieve the maximum note ID: {}".format(queryObj.lastError().text()))
+      return None
+
+    return maxId + 1

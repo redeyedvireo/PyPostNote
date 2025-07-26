@@ -34,6 +34,7 @@ class NoteData:
     self.bgColor = QtGui.QColor('yellow')
     self.bgType = ENoteBackground(0)
     self.transparency = 100
+    self.isFavoriteNote = False   # Whether this note is a favorite note
 
   @property
   def noteStyle(self) -> NoteStyle:
@@ -52,3 +53,8 @@ class NoteData:
     self.textColor = noteStyle.textColor
     self.bgType = noteStyle.backgroundType
     self.transparency = noteStyle.transparency
+
+class FavoriteNoteData:
+  def __init__(self, noteId: NOTE_ID, title: str):
+    self.noteId = noteId
+    self.title = title
