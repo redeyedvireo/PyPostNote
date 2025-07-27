@@ -478,6 +478,33 @@ class Database:
     else:
       return True
 
+  def updateNoteTitle(self, noteId: NOTE_ID, newTitle: str) -> bool:
+    """Updates the title of a note in the database.
+
+    Args:
+        noteId (NOTE_ID): ID of the note to update
+        newTitle (str): New title for the note
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    queryObj = QtSql.QSqlQuery()
+    queryObj.prepare("update notes set title=? where noteid=?")
+
+    queryObj.addBindValue(newTitle)
+    queryObj.addBindValue(noteId)
+
+    queryObj.exec_()
+
+    # Check for errors
+    sqlErr = queryObj.lastError()
+
+    if sqlErr.type() != QtSql.QSqlError.ErrorType.NoError:
+      self.reportError(f'[updateNoteTitle] error: {sqlErr.text()}')
+      return False
+    else:
+      return True
+
   def deleteNote(self, noteId: NOTE_ID) -> bool:
     """Deletes a note from the database.
 

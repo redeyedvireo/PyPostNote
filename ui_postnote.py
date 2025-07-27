@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'postnote.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.0
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -63,6 +63,9 @@ class Ui_PostNoteClass(object):
         self.actionEdit_Styles = QAction(PostNoteClass)
         self.actionEdit_Styles.setObjectName(u"actionEdit_Styles")
         self.actionEdit_Styles.setMenuRole(QAction.MenuRole.NoRole)
+        self.actionEdit_Favorites = QAction(PostNoteClass)
+        self.actionEdit_Favorites.setObjectName(u"actionEdit_Favorites")
+        self.actionEdit_Favorites.setMenuRole(QAction.MenuRole.NoRole)
         self.centralWidget = QWidget(PostNoteClass)
         self.centralWidget.setObjectName(u"centralWidget")
         PostNoteClass.setCentralWidget(self.centralWidget)
@@ -114,5 +117,6 @@ class Ui_PostNoteClass(object):
 #endif // QT_CONFIG(tooltip)
         self.actionDebug_Mode.setText(QCoreApplication.translate("PostNoteClass", u"Debug Mode...", None))
         self.actionEdit_Styles.setText(QCoreApplication.translate("PostNoteClass", u"Edit Styles...", None))
+        self.actionEdit_Favorites.setText(QCoreApplication.translate("PostNoteClass", u"Edit Favorites...", None))
     # retranslateUi
 

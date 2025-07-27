@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'note_properties_dlg.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.0
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -41,29 +41,29 @@ class Ui_notePropertiesDialog(object):
         self.label = QLabel(notePropertiesDialog)
         self.label.setObjectName(u"label")
 
-        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.label)
 
         self.createdWhenLabel = QLabel(notePropertiesDialog)
         self.createdWhenLabel.setObjectName(u"createdWhenLabel")
 
-        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.createdWhenLabel)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.createdWhenLabel)
 
         self.label_2 = QLabel(notePropertiesDialog)
         self.label_2.setObjectName(u"label_2")
         self.label_2.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_2)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_2)
 
         self.titleEdit = QLineEdit(notePropertiesDialog)
         self.titleEdit.setObjectName(u"titleEdit")
 
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.titleEdit)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.titleEdit)
 
         self.label_3 = QLabel(notePropertiesDialog)
         self.label_3.setObjectName(u"label_3")
         self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
-        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.label_3)
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.label_3)
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
@@ -85,12 +85,12 @@ class Ui_notePropertiesDialog(object):
         self.horizontalLayout_3.addWidget(self.editTopicsButton)
 
 
-        self.formLayout.setLayout(2, QFormLayout.FieldRole, self.horizontalLayout_3)
+        self.formLayout.setLayout(2, QFormLayout.ItemRole.FieldRole, self.horizontalLayout_3)
 
         self.alwaysOnTopCheckBox = QCheckBox(notePropertiesDialog)
         self.alwaysOnTopCheckBox.setObjectName(u"alwaysOnTopCheckBox")
 
-        self.formLayout.setWidget(3, QFormLayout.FieldRole, self.alwaysOnTopCheckBox)
+        self.formLayout.setWidget(3, QFormLayout.ItemRole.FieldRole, self.alwaysOnTopCheckBox)
 
 
         self.verticalLayout_2.addLayout(self.formLayout)

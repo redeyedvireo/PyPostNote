@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'quick_create_dlg.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.0
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -35,17 +35,17 @@ class Ui_QuickCreateDlg(object):
         self.label = QLabel(QuickCreateDlg)
         self.label.setObjectName(u"label")
 
-        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.label)
 
         self.titleEdit = QLineEdit(QuickCreateDlg)
         self.titleEdit.setObjectName(u"titleEdit")
 
-        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.titleEdit)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.titleEdit)
 
         self.label_2 = QLabel(QuickCreateDlg)
         self.label_2.setObjectName(u"label_2")
 
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_2)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_2)
 
         self.sizeCombo = QComboBox(QuickCreateDlg)
         self.sizeCombo.addItem("")
@@ -54,12 +54,12 @@ class Ui_QuickCreateDlg(object):
         self.sizeCombo.addItem("")
         self.sizeCombo.setObjectName(u"sizeCombo")
 
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.sizeCombo)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.sizeCombo)
 
         self.label_3 = QLabel(QuickCreateDlg)
         self.label_3.setObjectName(u"label_3")
 
-        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.label_3)
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.label_3)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setSpacing(6)
@@ -80,7 +80,7 @@ class Ui_QuickCreateDlg(object):
         self.horizontalLayout.addWidget(self.topicsButton)
 
 
-        self.formLayout.setLayout(2, QFormLayout.FieldRole, self.horizontalLayout)
+        self.formLayout.setLayout(2, QFormLayout.ItemRole.FieldRole, self.horizontalLayout)
 
 
         self.verticalLayout.addLayout(self.formLayout)

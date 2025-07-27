@@ -15,6 +15,7 @@ from topic import Topic
 from topic_manager import TopicManager
 from ui_postnote import Ui_PostNoteClass
 from edit_topics_dialog import EditTopicsDialog
+from edit_favorite_notes_dlg import EditFavoriteNotesDialog
 from util import getDatabasePath, getPrefsPath, getStorageDirectory, getStyleDefsPath
 import logging
 
@@ -149,6 +150,7 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     self.trayIconMenu.addSeparator()
     self.trayIconMenu.addAction(self.ui.actionEdit_Topics)
     self.trayIconMenu.addAction(self.ui.actionEdit_Styles)
+    self.trayIconMenu.addAction(self.ui.actionEdit_Favorites)
     self.trayIconMenu.addAction(self.ui.actionPreferences)
 
     self.trayIconMenu.addSeparator()
@@ -427,6 +429,13 @@ class PostNoteWindow(QtWidgets.QMainWindow):
     # Save style defs
     styleDefsPath = getStyleDefsPath(kAppName, kStyleDefsName)
     self.styleManager.saveStyleDefs(styleDefsPath)
+
+  @QtCore.Slot()
+  def on_actionEdit_Favorites_triggered(self):
+    """Opens the Favorites dialog, which allows the user to edit favorite notes.
+    """
+    dlg = EditFavoriteNotesDialog(self.noteManager, self.db, self)
+    dlg.exec()
 
   @QtCore.Slot()
   def on_actionPreferences_triggered(self):

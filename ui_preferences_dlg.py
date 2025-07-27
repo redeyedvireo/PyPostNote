@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'preferences_dlg.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.0
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -32,22 +32,22 @@ class Ui_PreferencesDlg(object):
         self.label_3 = QLabel(PreferencesDlg)
         self.label_3.setObjectName(u"label_3")
 
-        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label_3)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.label_3)
 
         self.fontComboBox = QFontComboBox(PreferencesDlg)
         self.fontComboBox.setObjectName(u"fontComboBox")
 
-        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.fontComboBox)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.fontComboBox)
 
         self.label_4 = QLabel(PreferencesDlg)
         self.label_4.setObjectName(u"label_4")
 
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_4)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_4)
 
         self.fontSizeComboBox = QComboBox(PreferencesDlg)
         self.fontSizeComboBox.setObjectName(u"fontSizeComboBox")
 
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.fontSizeComboBox)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.fontSizeComboBox)
 
 
         self.verticalLayout.addLayout(self.formLayout)

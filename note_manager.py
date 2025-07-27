@@ -128,6 +128,25 @@ class NoteManager(QtCore.QObject):
     if noteId not in self.favoriteNoteData:
       self.favoriteNoteData[noteId] = noteFavoriteData
 
+  def updateFavoriteNoteTitle(self, noteId: NOTE_ID, newTitle: str):
+    """Updates the title of a favorite note.
+
+    Args:
+        noteId (NOTE_ID): ID of the note to update
+        newTitle (str): New title for the favorite note
+    """
+    if noteId in self.favoriteNoteData:
+      self.favoriteNoteData[noteId].title = newTitle
+
+  def removeNoteFromFavorites(self, noteId: NOTE_ID):
+    """Removes the note with the given ID from the list of favorite notes.
+
+    Args:
+        noteId (NOTE_ID): ID of the note to remove from favorites
+    """
+    if noteId in self.favoriteNoteData:
+      del self.favoriteNoteData[noteId]
+
   def createNote(self, noteId: NOTE_ID, useNewId = False):
     """Creates a new note with the given ID.  If useNewId is True, a new ID will be generated.
        if the given ID is already in use.
